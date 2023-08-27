@@ -30,15 +30,6 @@ solhint :; solhint -f table "{contracts,test,scripts}/**/*.sol"
 # to install slither, visit [https://github.com/crytic/slither]
 slither :; slither . --fail-low
 
-# mythril
-mythril :
-	@echo " > \033[32mChecking contracts with mythril...\033[0m"
-	./tools/mythril.sh
-
-mythx :
-	@echo " > \033[32mChecking contracts with mythx...\033[0m"
-	mythx analyze
-
 # Lints
 lint :; npx prettier --write "{contracts,test,scripts}/**/*.{sol,ts}"
 
