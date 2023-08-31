@@ -1,0 +1,618 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title></title>
+        <meta name="robots" content="noindex" />
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="book.css">
+
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = null;
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item "><a href="index.html">Home</a></li><li class="chapter-item affix "><li class="part-title">contracts</li><li class="chapter-item "><a href="contracts/employment/index.html">❱ employment</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="contracts/employment/EmployWithConfig.sol/contract.EmployWithConfig.html">EmployWithConfig</a></li></ol></li><li class="chapter-item "><a href="contracts/interfaces/index.html">❱ interfaces</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="contracts/interfaces/IEmployWithConfig.sol/interface.IEmployWithConfig.html">IEmployWithConfig</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title"></h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/pseudoyu/openbuild-contracts" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="openbuild-contracts"><a class="header" href="#openbuild-contracts">openbuild-contracts</a></h1>
+<ul>
+<li><a href="https://app.heptabase.com/w/d996e9ee10666fdc0ebeeebf614665534bdc57ea89b6fff104dc8db924276462?id=b5527e3d-fbef-46a2-a953-020dd9ba0e92">Contract Design</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="contents"><a class="header" href="#contents">Contents</a></h1>
+<ul>
+<li><a href="contracts/employment/EmployWithConfig.sol/contract.EmployWithConfig.html">EmployWithConfig</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="employwithconfig"><a class="header" href="#employwithconfig">EmployWithConfig</a></h1>
+<p><a href="https://github.com/pseudoyu/openbuild-contracts/blob/0fb21a31bd35f8b0aec7854aec700923530a489d/contracts/employment/EmployWithConfig.sol">Git Source</a></p>
+<p><strong>Inherits:</strong>
+<a href="contracts/employment/EmployWithConfig.sol//contracts/interfaces/IEmployWithConfig.sol/interface.IEmployWithConfig.html">IEmployWithConfig</a>, ReentrancyGuard</p>
+<p>Logic to handle the employemnt that the employer can set the employment config for a cooperation.,</p>
+<p><em>Employer can set config for a specific employment, and developer can claim the salary by config id.
+For <code>SetEmploymentConfig</code>
+Employer can set the employment config for a specific employment <br>
+For <code>claimSalary</code>
+Anyone can claim the salary by employment id, and it will transfer all available tokens
+from the contract account to the <code>developer</code> account.</em></p>
+<h2 id="state-variables"><a class="header" href="#state-variables">State Variables</a></h2>
+<h3 id="_employmentconfigs"><a class="header" href="#_employmentconfigs">_employmentConfigs</a></h3>
+<pre><code class="language-solidity">mapping(string employmentConfigId =&gt; EmploymentConfig) internal _employmentConfigs;
+</code></pre>
+<h3 id="_feefractions"><a class="header" href="#_feefractions">_feeFractions</a></h3>
+<pre><code class="language-solidity">mapping(address feeReceiver =&gt; uint256 fraction) internal _feeFractions;
+</code></pre>
+<h3 id="_feefractions4employment"><a class="header" href="#_feefractions4employment">_feeFractions4Employment</a></h3>
+<pre><code class="language-solidity">mapping(address feeReceiver =&gt; mapping(string employmentConfigId =&gt; uint256 fraction)) internal _feeFractions4Employment;
+</code></pre>
+<h2 id="functions"><a class="header" href="#functions">Functions</a></h2>
+<h3 id="onlyfeereceiver"><a class="header" href="#onlyfeereceiver">onlyFeeReceiver</a></h3>
+<pre><code class="language-solidity">modifier onlyFeeReceiver(address feeReceiver);
+</code></pre>
+<h3 id="validatefraction"><a class="header" href="#validatefraction">validateFraction</a></h3>
+<pre><code class="language-solidity">modifier validateFraction(uint256 fraction);
+</code></pre>
+<h3 id="configidnotempty"><a class="header" href="#configidnotempty">configIdNotEmpty</a></h3>
+<pre><code class="language-solidity">modifier configIdNotEmpty(string calldata employmentConfigId);
+</code></pre>
+<h3 id="setdefaultfeefraction"><a class="header" href="#setdefaultfeefraction">setDefaultFeeFraction</a></h3>
+<p>Sets the default fee percentage of specific receiver.</p>
+<p><em>The feeReceiver can be a platform account.</em></p>
+<pre><code class="language-solidity">function setDefaultFeeFraction(address feeReceiver, uint256 fraction)
+    external
+    override
+    onlyFeeReceiver(feeReceiver)
+    validateFraction(fraction);
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>feeReceiver</code></td><td><code>address</code></td><td>The fee receiver address.</td></tr>
+<tr><td><code>fraction</code></td><td><code>uint256</code></td><td>The percentage measured in basis points. Each basis point represents 0.01%.</td></tr>
+</tbody></table>
+</div>
+<h3 id="setfeefraction"><a class="header" href="#setfeefraction">setFeeFraction</a></h3>
+<p>Sets the fee percentage of specific &lt;receiver, employmentId&gt;.</p>
+<p><em>If this is set, it will override the default fee fraction.</em></p>
+<pre><code class="language-solidity">function setFeeFraction(string calldata employmentConfigId, address feeReceiver, uint256 fraction)
+    external
+    override
+    onlyFeeReceiver(feeReceiver)
+    validateFraction(fraction);
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>employmentConfigId</code></td><td><code>string</code></td><td>The employment ID.</td></tr>
+<tr><td><code>feeReceiver</code></td><td><code>address</code></td><td>The fee receiver address.</td></tr>
+<tr><td><code>fraction</code></td><td><code>uint256</code></td><td>The percentage measured in basis points. Each basis point represents 0.01%.</td></tr>
+</tbody></table>
+</div>
+<h3 id="setemploymentconfig"><a class="header" href="#setemploymentconfig">setEmploymentConfig</a></h3>
+<p>Sets the employment config of specific employment id. <br>
+Emits a {SetEmploymentConfig} event.</p>
+<p><em>If the employment config of specific &lt;fromCharacter, toCharacter&gt; is already,
+it will try to collect the employment first, and then override the employment config.</em></p>
+<pre><code class="language-solidity">function setEmploymentConfig(
+    string calldata employmentConfigId,
+    string calldata prevEmploymentConfigId,
+    address developer,
+    address token,
+    uint256 amount,
+    uint256 startTime,
+    uint256 endTime,
+    address feeReceiver
+) external override configIdNotEmpty(employmentConfigId);
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>employmentConfigId</code></td><td><code>string</code></td><td>The employment signature.</td></tr>
+<tr><td><code>prevEmploymentConfigId</code></td><td><code>string</code></td><td></td></tr>
+<tr><td><code>developer</code></td><td><code>address</code></td><td></td></tr>
+<tr><td><code>token</code></td><td><code>address</code></td><td>The token address.</td></tr>
+<tr><td><code>amount</code></td><td><code>uint256</code></td><td>The amount of token.</td></tr>
+<tr><td><code>startTime</code></td><td><code>uint256</code></td><td>The start time of employment.</td></tr>
+<tr><td><code>endTime</code></td><td><code>uint256</code></td><td>The end time of employment.</td></tr>
+<tr><td><code>feeReceiver</code></td><td><code>address</code></td><td>The fee receiver address.</td></tr>
+</tbody></table>
+</div>
+<h3 id="cancelemployment"><a class="header" href="#cancelemployment">cancelEmployment</a></h3>
+<p>Cancels the employment. <br>
+Emits a {CancelEmployment} event.</p>
+<p><em>It will try to collect the remaining assets first, and then delete the employment config.</em></p>
+<pre><code class="language-solidity">function cancelEmployment(string calldata employmentConfigId) external override configIdNotEmpty(employmentConfigId);
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>employmentConfigId</code></td><td><code>string</code></td><td>The employment config ID to cancel.</td></tr>
+</tbody></table>
+</div>
+<h3 id="claimsalary"><a class="header" href="#claimsalary">claimSalary</a></h3>
+<pre><code class="language-solidity">function claimSalary(string calldata employmentConfigId, uint256 claimTimestamp)
+    external
+    override
+    configIdNotEmpty(employmentConfigId)
+    nonReentrant;
+</code></pre>
+<h3 id="getfeefraction"><a class="header" href="#getfeefraction">getFeeFraction</a></h3>
+<p>Returns the fee percentage of specific &lt;receiver, employment&gt;.</p>
+<p><em>It will return the first non-zero value by priority feeFraction4Character and defaultFeeFraction.</em></p>
+<pre><code class="language-solidity">function getFeeFraction(string calldata employmentConfigId, address feeReceiver)
+    external
+    view
+    override
+    configIdNotEmpty(employmentConfigId)
+    returns (uint256);
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>employmentConfigId</code></td><td><code>string</code></td><td>The employment config ID.</td></tr>
+<tr><td><code>feeReceiver</code></td><td><code>address</code></td><td>The fee receiver address.</td></tr>
+</tbody></table>
+</div>
+<p><strong>Returns</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>&lt;none&gt;</code></td><td><code>uint256</code></td><td>fraction The percentage measured in basis points. Each basis point represents 0.01%.</td></tr>
+</tbody></table>
+</div>
+<h3 id="getfeeamount"><a class="header" href="#getfeeamount">getFeeAmount</a></h3>
+<p>Returns how much the fee is owed by &lt;feeFraction, employmentAmount&gt;.</p>
+<pre><code class="language-solidity">function getFeeAmount(string calldata employmentConfigId, address feeReceiver, uint256 amount)
+    external
+    view
+    override
+    configIdNotEmpty(employmentConfigId)
+    returns (uint256);
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>employmentConfigId</code></td><td><code>string</code></td><td>The employment config ID.</td></tr>
+<tr><td><code>feeReceiver</code></td><td><code>address</code></td><td>The fee receiver address.</td></tr>
+<tr><td><code>amount</code></td><td><code>uint256</code></td><td>The employment amount.</td></tr>
+</tbody></table>
+</div>
+<p><strong>Returns</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>&lt;none&gt;</code></td><td><code>uint256</code></td><td>The fee amount.</td></tr>
+</tbody></table>
+</div>
+<h3 id="getemploymentconfig"><a class="header" href="#getemploymentconfig">getEmploymentConfig</a></h3>
+<p>Return the employment config.</p>
+<pre><code class="language-solidity">function getEmploymentConfig(string calldata employmentConfigId)
+    external
+    view
+    override
+    configIdNotEmpty(employmentConfigId)
+    returns (EmploymentConfig memory config);
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>employmentConfigId</code></td><td><code>string</code></td><td>The employment config ID.</td></tr>
+</tbody></table>
+</div>
+<h3 id="getavailablesalary"><a class="header" href="#getavailablesalary">getAvailableSalary</a></h3>
+<p>Returns the available salary of specific &lt;employment, claimTimestamp&gt;.</p>
+<p><em>It will return the available salary of specific &lt;employment, claimTimestamp&gt;.</em></p>
+<pre><code class="language-solidity">function getAvailableSalary(string calldata employmentConfigId, uint256 claimTimestamp)
+    external
+    view
+    override
+    configIdNotEmpty(employmentConfigId)
+    returns (uint256);
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>employmentConfigId</code></td><td><code>string</code></td><td>The employment config ID.</td></tr>
+<tr><td><code>claimTimestamp</code></td><td><code>uint256</code></td><td>The claim time.</td></tr>
+</tbody></table>
+</div>
+<p><strong>Returns</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>&lt;none&gt;</code></td><td><code>uint256</code></td><td>The available salary.</td></tr>
+</tbody></table>
+</div>
+<h3 id="_getfeefraction"><a class="header" href="#_getfeefraction">_getFeeFraction</a></h3>
+<pre><code class="language-solidity">function _getFeeFraction(string calldata employmentConfigId, address feeReceiver) internal view returns (uint256);
+</code></pre>
+<h3 id="_getfeeamount"><a class="header" href="#_getfeeamount">_getFeeAmount</a></h3>
+<pre><code class="language-solidity">function _getFeeAmount(string calldata employmentConfigId, address feeReceiver, uint256 amount)
+    internal
+    view
+    returns (uint256);
+</code></pre>
+<h3 id="_getavailablesalary"><a class="header" href="#_getavailablesalary">_getAvailableSalary</a></h3>
+<pre><code class="language-solidity">function _getAvailableSalary(uint256 amount, uint256 currentTime, uint256 startTime, uint256 endTime)
+    internal
+    pure
+    returns (uint256);
+</code></pre>
+<h3 id="_feedenominator"><a class="header" href="#_feedenominator">_feeDenominator</a></h3>
+<p><em>Defaults to 10000 so fees are expressed in basis points.</em></p>
+<pre><code class="language-solidity">function _feeDenominator() internal pure virtual returns (uint96);
+</code></pre>
+<h2 id="events"><a class="header" href="#events">Events</a></h2>
+<h3 id="setemploymentconfig-1"><a class="header" href="#setemploymentconfig-1">SetEmploymentConfig</a></h3>
+<p><em>Emitted when a employer set the employment config.</em></p>
+<pre><code class="language-solidity">event SetEmploymentConfig(
+    string indexed employmentConfigId,
+    address indexed employerAddress,
+    address indexed developerAddress,
+    address token,
+    uint256 amount,
+    uint256 refundedAmount,
+    uint256 additonalAmount,
+    uint256 startTime,
+    uint256 endTime,
+    address feeReceiver
+);
+</code></pre>
+<h3 id="claimsalary-1"><a class="header" href="#claimsalary-1">ClaimSalary</a></h3>
+<p><em>Emitted when a developer claim the salary.</em></p>
+<pre><code class="language-solidity">event ClaimSalary(string indexed employmentConfigId, address token, uint256 claimAmount);
+</code></pre>
+<h3 id="cancelemployment-1"><a class="header" href="#cancelemployment-1">CancelEmployment</a></h3>
+<p><em>Emitted when a developer claim the salary.</em></p>
+<pre><code class="language-solidity">event CancelEmployment(string indexed employmentConfigId, address token, uint256 refundedAmount);
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="contents-1"><a class="header" href="#contents-1">Contents</a></h1>
+<ul>
+<li><a href="contracts/interfaces/IEmployWithConfig.sol/interface.IEmployWithConfig.html">IEmployWithConfig</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="iemploywithconfig"><a class="header" href="#iemploywithconfig">IEmployWithConfig</a></h1>
+<p><a href="https://github.com/pseudoyu/openbuild-contracts/blob/0fb21a31bd35f8b0aec7854aec700923530a489d/contracts/interfaces/IEmployWithConfig.sol">Git Source</a></p>
+<p>This is the interface for the EmployWithConfig contract.</p>
+<h2 id="functions-1"><a class="header" href="#functions-1">Functions</a></h2>
+<h3 id="setdefaultfeefraction-1"><a class="header" href="#setdefaultfeefraction-1">setDefaultFeeFraction</a></h3>
+<p>Sets the default fee percentage of specific receiver.</p>
+<p><em>The feeReceiver can be a platform account.</em></p>
+<pre><code class="language-solidity">function setDefaultFeeFraction(address feeReceiver, uint256 fraction) external;
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>feeReceiver</code></td><td><code>address</code></td><td>The fee receiver address.</td></tr>
+<tr><td><code>fraction</code></td><td><code>uint256</code></td><td>The percentage measured in basis points. Each basis point represents 0.01%.</td></tr>
+</tbody></table>
+</div>
+<h3 id="setfeefraction-1"><a class="header" href="#setfeefraction-1">setFeeFraction</a></h3>
+<p>Sets the fee percentage of specific &lt;receiver, employmentId&gt;.</p>
+<p><em>If this is set, it will override the default fee fraction.</em></p>
+<pre><code class="language-solidity">function setFeeFraction(string calldata employmentConfigId, address feeReceiver, uint256 fraction) external;
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>employmentConfigId</code></td><td><code>string</code></td><td>The employment ID.</td></tr>
+<tr><td><code>feeReceiver</code></td><td><code>address</code></td><td>The fee receiver address.</td></tr>
+<tr><td><code>fraction</code></td><td><code>uint256</code></td><td>The percentage measured in basis points. Each basis point represents 0.01%.</td></tr>
+</tbody></table>
+</div>
+<h3 id="setemploymentconfig-2"><a class="header" href="#setemploymentconfig-2">setEmploymentConfig</a></h3>
+<p>Sets the employment config of specific employment id. <br>
+Emits a {SetEmploymentConfig} event.</p>
+<p><em>If the employment config of specific &lt;fromCharacter, toCharacter&gt; is already,
+it will try to collect the employment first, and then override the employment config.</em></p>
+<pre><code class="language-solidity">function setEmploymentConfig(
+    string calldata employmentConfigId,
+    string calldata prevEmploymentConfigId,
+    address develper,
+    address token,
+    uint256 amount,
+    uint256 startTime,
+    uint256 endTime,
+    address feeReceiver
+) external;
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>employmentConfigId</code></td><td><code>string</code></td><td>The employment signature.</td></tr>
+<tr><td><code>prevEmploymentConfigId</code></td><td><code>string</code></td><td></td></tr>
+<tr><td><code>develper</code></td><td><code>address</code></td><td>The developer address.</td></tr>
+<tr><td><code>token</code></td><td><code>address</code></td><td>The token address.</td></tr>
+<tr><td><code>amount</code></td><td><code>uint256</code></td><td>The amount of token.</td></tr>
+<tr><td><code>startTime</code></td><td><code>uint256</code></td><td>The start time of employment.</td></tr>
+<tr><td><code>endTime</code></td><td><code>uint256</code></td><td>The end time of employment.</td></tr>
+<tr><td><code>feeReceiver</code></td><td><code>address</code></td><td>The fee receiver address.</td></tr>
+</tbody></table>
+</div>
+<h3 id="cancelemployment-2"><a class="header" href="#cancelemployment-2">cancelEmployment</a></h3>
+<p>Cancels the employment. <br>
+Emits a {CancelEmployment} event.</p>
+<p><em>It will try to collect the remaining assets first, and then delete the employment config.</em></p>
+<p><em>Only the employment creator can cancel the employment.</em></p>
+<pre><code class="language-solidity">function cancelEmployment(string calldata employmentConfigId) external;
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>employmentConfigId</code></td><td><code>string</code></td><td>The employment config ID to cancel.</td></tr>
+</tbody></table>
+</div>
+<h3 id="claimsalary-2"><a class="header" href="#claimsalary-2">claimSalary</a></h3>
+<p>Claims all unredeemed salary from the contract to developer address. <br>
+Emits a {ClaimEmployment} event if claims successfully.</p>
+<p><em>It will transfer all unredeemed token from the contract to the <code>developer</code>.</em></p>
+<pre><code class="language-solidity">function claimSalary(string calldata employmentConfigId, uint256 claimTimestamp) external;
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>employmentConfigId</code></td><td><code>string</code></td><td>The employment config ID.</td></tr>
+<tr><td><code>claimTimestamp</code></td><td><code>uint256</code></td><td>The claim time.</td></tr>
+</tbody></table>
+</div>
+<h3 id="getfeefraction-1"><a class="header" href="#getfeefraction-1">getFeeFraction</a></h3>
+<p>Returns the fee percentage of specific &lt;receiver, employment&gt;.</p>
+<p><em>It will return the first non-zero value by priority feeFraction4Character and defaultFeeFraction.</em></p>
+<pre><code class="language-solidity">function getFeeFraction(string calldata employmentConfigId, address feeReceiver) external view returns (uint256);
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>employmentConfigId</code></td><td><code>string</code></td><td>The employment config ID.</td></tr>
+<tr><td><code>feeReceiver</code></td><td><code>address</code></td><td>The fee receiver address.</td></tr>
+</tbody></table>
+</div>
+<p><strong>Returns</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>&lt;none&gt;</code></td><td><code>uint256</code></td><td>fraction The percentage measured in basis points. Each basis point represents 0.01%.</td></tr>
+</tbody></table>
+</div>
+<h3 id="getfeeamount-1"><a class="header" href="#getfeeamount-1">getFeeAmount</a></h3>
+<p>Returns how much the fee is owed by &lt;feeFraction, employmentAmount&gt;.</p>
+<pre><code class="language-solidity">function getFeeAmount(string calldata employmentConfigId, address feeReceiver, uint256 amount)
+    external
+    view
+    returns (uint256);
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>employmentConfigId</code></td><td><code>string</code></td><td>The employment config ID.</td></tr>
+<tr><td><code>feeReceiver</code></td><td><code>address</code></td><td>The fee receiver address.</td></tr>
+<tr><td><code>amount</code></td><td><code>uint256</code></td><td>The employment amount.</td></tr>
+</tbody></table>
+</div>
+<p><strong>Returns</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>&lt;none&gt;</code></td><td><code>uint256</code></td><td>The fee amount.</td></tr>
+</tbody></table>
+</div>
+<h3 id="getemploymentconfig-1"><a class="header" href="#getemploymentconfig-1">getEmploymentConfig</a></h3>
+<p>Return the employment config.</p>
+<pre><code class="language-solidity">function getEmploymentConfig(string calldata employmentConfigId)
+    external
+    view
+    returns (EmploymentConfig memory config);
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>employmentConfigId</code></td><td><code>string</code></td><td>The employment config ID.</td></tr>
+</tbody></table>
+</div>
+<h3 id="getavailablesalary-1"><a class="header" href="#getavailablesalary-1">getAvailableSalary</a></h3>
+<p>Returns the available salary of specific &lt;employment, claimTimestamp&gt;.</p>
+<p><em>It will return the available salary of specific &lt;employment, claimTimestamp&gt;.</em></p>
+<pre><code class="language-solidity">function getAvailableSalary(string calldata employmentConfigId, uint256 claimTimestamp)
+    external
+    view
+    returns (uint256);
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>employmentConfigId</code></td><td><code>string</code></td><td>The employment config ID.</td></tr>
+<tr><td><code>claimTimestamp</code></td><td><code>uint256</code></td><td>The claim time.</td></tr>
+</tbody></table>
+</div>
+<p><strong>Returns</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>&lt;none&gt;</code></td><td><code>uint256</code></td><td>The available salary.</td></tr>
+</tbody></table>
+</div>
+<h2 id="structs"><a class="header" href="#structs">Structs</a></h2>
+<h3 id="employmentconfig"><a class="header" href="#employmentconfig">EmploymentConfig</a></h3>
+<pre><code class="language-solidity">struct EmploymentConfig {
+    string id;
+    address employer;
+    address developer;
+    address token;
+    uint256 amount;
+    uint256 claimedAmount;
+    uint256 startTime;
+    uint256 endTime;
+    address feeReceiver;
+}
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="solidity.min.js"></script>
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </div>
+    </body>
+</html>
