@@ -112,10 +112,22 @@ contract EmployWithConfig is IEmployWithConfig, Initializable, ReentrancyGuard {
         uint256 endTime,
         address feeReceiver
     ) external override {
-        // solhint-disable-next-line not-rely-on-time
-        require(startTime >= block.timestamp, "EmployWithConfig: start time must be future");
         require(endTime > startTime, "EmployWithConfig: end time must be greater than start time");
         require(amount > 0, "EmployWithConfig: amount must be greater than zero");
+
+        // update tips config
+        _employmentConfigs[employmentConfigId] = EmploymentConfig({
+            id: employmentConfigId,
+            employer: msg.sender,
+            developer: developer,
+            token: token,
+            amount: amount,
+            startTime: startTime,
+            endTime: endTime,
+            feeReceiver: feeReceiver
+        });
+
+        IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
 
         // set the employment config
         emit SetEmploymentConfig(
@@ -136,6 +148,7 @@ contract EmployWithConfig is IEmployWithConfig, Initializable, ReentrancyGuard {
         require(msg.sender == config.employer, "EmployWithConfig: not employer");
 
         // collect remaining funds first
+        IERC20(config.token).safeTransferFrom(address(this), config.employer, config.amount);
 
         // delete tips config
         delete _employmentConfigs[config.id];
