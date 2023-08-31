@@ -52,7 +52,7 @@ function getChainConfig(chain: keyof typeof chainIds): NetworkUserConfig {
             jsonRpcUrl = "https://" + chain + ".infura.io/v3/" + infuraApiKey;
     }
     return {
-        accounts: [process.env.PRIVATE_KEY],
+        accounts: [process.env.PRIVATE_KEY || ""],
         chainId: chainIds[chain],
         url: jsonRpcUrl,
     };
@@ -66,6 +66,7 @@ module.exports = {
                 enabled: true,
                 runs: 200,
             },
+            viaIR: true,
         },
     },
     docgen: {

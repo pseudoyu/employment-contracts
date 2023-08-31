@@ -14,14 +14,14 @@ install :; forge install --no-commit
 update:; forge update
 
 # Builds
-build  :; forge build
+build  :; forge build --via-ir
 
 # chmod scripts
 scripts :; chmod +x ./scripts/*
 
 # Tests
 # --ffi # enable if you need the `ffi` cheat code on HEVM
-foundry-test :; forge clean && forge test --optimize --optimizer-runs 200 -v
+foundry-test :; forge clean && forge test --optimize --optimizer-runs 200 --via-ir -v
 
 # Run solhint
 solhint :; solhint -f table "{contracts,test,scripts}/**/*.sol"
