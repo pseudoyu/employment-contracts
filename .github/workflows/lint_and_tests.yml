@@ -38,8 +38,9 @@ jobs:
         with:
           version: nightly
 
-      - name: Forge Install
+      - name: Install Dependencies
         run: |
+          yarn install --frozen-lockfile
           forge install --no-commit
           forge update
         id: install
