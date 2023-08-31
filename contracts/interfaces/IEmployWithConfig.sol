@@ -10,6 +10,7 @@ pragma solidity 0.8.18;
 interface IEmployWithConfig {
     struct EmploymentConfig {
         string id;
+        address employer;
         address developer;
         address token;
         uint256 amount;
@@ -19,7 +20,7 @@ interface IEmployWithConfig {
     }
 
     /**
-     * @notice Initialize the contract, setting web3Entry address.
+     * @notice Initialize the contract
      */
     function initialize() external;
 
@@ -59,7 +60,7 @@ interface IEmployWithConfig {
      */
     function setEmploymentConfig(
         string calldata employmentConfigId,
-        uint256 develper,
+        address develper,
         address token,
         uint256 amount,
         uint256 startTime,
@@ -74,7 +75,7 @@ interface IEmployWithConfig {
      * @dev Only the employment creator can cancel the employment.
      * @param employmentConfigId The employment config ID to cancel.
      */
-    function cancelEmployment(uint256 employmentConfigId) external;
+    function cancelEmployment(string calldata employmentConfigId) external;
 
     /**
      * @notice Claims all unredeemed salary from the contract to developer address. <br>
@@ -82,7 +83,7 @@ interface IEmployWithConfig {
      * @dev It will transfer all unredeemed token from the contract to the `developer`.
      * @param employmentConfigId The employment config ID.
      */
-    function claimSalary(uint256 employmentConfigId) external;
+    function claimSalary(string calldata employmentConfigId) external;
 
     /**
      * @notice Returns the fee percentage of specific <receiver, employment>.
