@@ -38,6 +38,12 @@ jobs:
         with:
           version: nightly
 
+      - name: Forge Install
+        run: |
+          forge install --no-commit
+          forge update
+        id: install
+
       - name: Run Forge build
         run: |
           forge --version
