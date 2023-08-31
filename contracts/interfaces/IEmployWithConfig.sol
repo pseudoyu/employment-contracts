@@ -14,15 +14,11 @@ interface IEmployWithConfig {
         address developer;
         address token;
         uint256 amount;
+        uint256 claimedAmount;
         uint256 startTime;
         uint256 endTime;
         address feeReceiver;
     }
-
-    /**
-     * @notice Initialize the contract
-     */
-    function initialize() external;
 
     /**
      * @notice Sets the default fee percentage of specific receiver.
@@ -60,6 +56,7 @@ interface IEmployWithConfig {
      */
     function setEmploymentConfig(
         string calldata employmentConfigId,
+        string calldata prevEmploymentConfigId,
         address develper,
         address token,
         uint256 amount,
@@ -82,8 +79,9 @@ interface IEmployWithConfig {
      * Emits a {ClaimEmployment} event if claims successfully.
      * @dev It will transfer all unredeemed token from the contract to the `developer`.
      * @param employmentConfigId The employment config ID.
+     * @param claimTimestamp The claim time.
      */
-    function claimSalary(string calldata employmentConfigId) external;
+    function claimSalary(string calldata employmentConfigId, uint256 claimTimestamp) external;
 
     /**
      * @notice Returns the fee percentage of specific <receiver, employment>.
@@ -101,12 +99,13 @@ interface IEmployWithConfig {
      * @notice Returns how much the fee is owed by <feeFraction, employmentAmount>.
      * @param employmentConfigId The employment config ID.
      * @param feeReceiver The fee receiver address.
+     * @param amount The employment amount.
      * @return The fee amount.
      */
     function getFeeAmount(
         string calldata employmentConfigId,
         address feeReceiver,
-        uint256 employmentAmount
+        uint256 amount
     ) external view returns (uint256);
 
     /**
@@ -116,4 +115,16 @@ interface IEmployWithConfig {
     function getEmploymentConfig(
         string calldata employmentConfigId
     ) external view returns (EmploymentConfig memory config);
+
+    /**
+     * @notice Returns the available salary of specific <employment, claimTimestamp>.
+     * @dev It will return the available salary of specific <employment, claimTimestamp>.
+     * @param employmentConfigId The employment config ID.
+     * @param claimTimestamp The claim time.
+     * @return The available salary.
+     */
+    function getAvailableSalary(
+        string calldata employmentConfigId,
+        uint256 claimTimestamp
+    ) external view returns (uint256);
 }

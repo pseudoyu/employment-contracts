@@ -6,7 +6,6 @@ import {IEmployWithConfig} from "../interfaces/IEmployWithConfig.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 /**
@@ -21,7 +20,7 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.
  * Anyone can claim the salary by employment id, and it will transfer all available tokens
  * from the contract account to the `developer` account.
  */
-contract EmployWithConfig is IEmployWithConfig, Initializable, ReentrancyGuard {
+contract EmployWithConfig is IEmployWithConfig, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     mapping(string employmentConfigId => EmploymentConfig) internal _employmentConfigs;
@@ -34,7 +33,7 @@ contract EmployWithConfig is IEmployWithConfig, Initializable, ReentrancyGuard {
     /**
      * @dev Emitted when a employer set the employment config.
      * @param employmentConfigId The employment signature.
-     * @param employerAddress The employer address.
+     * @param employerAddress The employer address.```
      * @param developerAddress The developer address.
      * @param token The token address.
      * @param amount The amount of token.
@@ -48,6 +47,8 @@ contract EmployWithConfig is IEmployWithConfig, Initializable, ReentrancyGuard {
         address indexed developerAddress,
         address token,
         uint256 amount,
+        uint256 refundedAmount,
+        uint256 additonalAmount,
         uint256 startTime,
         uint256 endTime,
         address feeReceiver
@@ -57,17 +58,21 @@ contract EmployWithConfig is IEmployWithConfig, Initializable, ReentrancyGuard {
      * @dev Emitted when a developer claim the salary.
      * @param employmentConfigId The employment signature.
      * @param token The token address.
-     * @param amount The amount of token.
+     * @param claimAmount The amount of token.
      */
-    event ClaimEmployment(string indexed employmentConfigId, address token, uint256 amount);
+    event ClaimSalary(string indexed employmentConfigId, address token, uint256 claimAmount);
 
     /**
      * @dev Emitted when a developer claim the salary.
      * @param employmentConfigId The employment signature.
      * @param token The token address.
-     * @param amount The amount of token.
+     * @param refundedAmount The amount of token.
      */
-    event CancelEmployment(string indexed employmentConfigId, address token, uint256 amount);
+    event CancelEmployment(
+        string indexed employmentConfigId,
+        address token,
+        uint256 refundedAmount
+    );
 
     modifier onlyFeeReceiver(address feeReceiver) {
         require(feeReceiver == msg.sender, "EmployWithConfig: caller is not fee receiver");
@@ -79,10 +84,12 @@ contract EmployWithConfig is IEmployWithConfig, Initializable, ReentrancyGuard {
         _;
     }
 
-    /// @inheritdoc IEmployWithConfig
-    function initialize() external override {
-        // solhint-disable-next-line avoid-tx-origin
-        require(tx.origin == msg.sender, "EmployWithConfig: FORBIDDEN");
+    modifier configIdNotEmpty(string calldata employmentConfigId) {
+        require(
+            bytes(employmentConfigId).length > 0,
+            "EmployWithConfig: employmentConfigId is empty"
+        );
+        _;
     }
 
     /// @inheritdoc IEmployWithConfig
@@ -105,37 +112,81 @@ contract EmployWithConfig is IEmployWithConfig, Initializable, ReentrancyGuard {
     /// @inheritdoc IEmployWithConfig
     function setEmploymentConfig(
         string calldata employmentConfigId,
+        string calldata prevEmploymentConfigId,
         address developer,
         address token,
         uint256 amount,
         uint256 startTime,
         uint256 endTime,
         address feeReceiver
-    ) external override {
+    ) external override configIdNotEmpty(employmentConfigId) {
         require(endTime > startTime, "EmployWithConfig: end time must be greater than start time");
         require(amount > 0, "EmployWithConfig: amount must be greater than zero");
 
-        // update tips config
-        _employmentConfigs[employmentConfigId] = EmploymentConfig({
-            id: employmentConfigId,
-            employer: msg.sender,
-            developer: developer,
-            token: token,
-            amount: amount,
-            startTime: startTime,
-            endTime: endTime,
-            feeReceiver: feeReceiver
-        });
+        uint256 refundedAmount;
+        uint256 additonalAmount;
 
-        IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
+        if (bytes(prevEmploymentConfigId).length > 0) {
+            EmploymentConfig storage prevConfig = _employmentConfigs[prevEmploymentConfigId];
 
-        // set the employment config
+            // add new employments config
+            _employmentConfigs[employmentConfigId] = EmploymentConfig({
+                id: employmentConfigId,
+                employer: msg.sender,
+                developer: developer,
+                token: token,
+                amount: amount,
+                claimedAmount: prevConfig.claimedAmount,
+                // start time and end time can not be changed
+                startTime: prevConfig.startTime,
+                endTime: prevConfig.endTime,
+                feeReceiver: feeReceiver
+            });
+
+            if (amount > prevConfig.amount) {
+                additonalAmount = amount - prevConfig.amount;
+                IERC20(prevConfig.token).safeTransferFrom(
+                    prevConfig.employer,
+                    address(this),
+                    additonalAmount
+                );
+            } else if (amount < prevConfig.amount) {
+                require(
+                    amount > prevConfig.claimedAmount,
+                    "EmployWithConfig: can not be smaller than claimed amount"
+                );
+                refundedAmount = prevConfig.amount - amount;
+                IERC20(prevConfig.token).safeTransfer(prevConfig.employer, refundedAmount);
+            }
+
+            // delete previous config
+            delete _employmentConfigs[prevEmploymentConfigId];
+        } else {
+            // add employments config
+            _employmentConfigs[employmentConfigId] = EmploymentConfig({
+                id: employmentConfigId,
+                employer: msg.sender,
+                developer: developer,
+                token: token,
+                amount: amount,
+                claimedAmount: 0,
+                startTime: startTime,
+                endTime: endTime,
+                feeReceiver: feeReceiver
+            });
+
+            IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
+        }
+
+        // set new employment config
         emit SetEmploymentConfig(
             employmentConfigId,
             msg.sender,
             developer,
             token,
             amount,
+            refundedAmount,
+            additonalAmount,
             startTime,
             endTime,
             feeReceiver
@@ -143,40 +194,63 @@ contract EmployWithConfig is IEmployWithConfig, Initializable, ReentrancyGuard {
     }
 
     /// @inheritdoc IEmployWithConfig
-    function cancelEmployment(string calldata employmentConfigId) external override {
+    function cancelEmployment(
+        string calldata employmentConfigId
+    ) external override configIdNotEmpty(employmentConfigId) {
         EmploymentConfig storage config = _employmentConfigs[employmentConfigId];
         require(msg.sender == config.employer, "EmployWithConfig: not employer");
 
-        // collect remaining funds first
-        IERC20(config.token).safeTransferFrom(address(this), config.employer, config.amount);
+        // calculate the remaining funds
+        if (config.amount > config.claimedAmount) {
+            IERC20(config.token).safeTransfer(
+                config.employer,
+                config.amount - config.claimedAmount
+            );
+        }
 
-        // delete tips config
+        // delete employment config
         delete _employmentConfigs[config.id];
 
         // emit event
-        emit CancelEmployment(config.id, config.token, config.amount);
+        emit CancelEmployment(config.id, config.token, config.amount - config.claimedAmount);
     }
 
     // @inheritdoc IEmployWithConfig
-    function claimSalary(string calldata employmentConfigId) external override nonReentrant {
+    function claimSalary(
+        string calldata employmentConfigId,
+        uint256 claimTimestamp
+    ) external override configIdNotEmpty(employmentConfigId) nonReentrant {
         EmploymentConfig storage config = _employmentConfigs[employmentConfigId];
         require(msg.sender == config.developer, "EmployWithConfig: not developer");
+        require(claimTimestamp >= config.startTime, "EmployWithConfig: project not started");
 
-        // collect remaining funds first
-        uint256 amount = IERC20(config.token).balanceOf(address(this));
-        if (amount > 0) {
-            IERC20(config.token).safeTransfer(config.developer, amount);
+        // calculate available funds
+        uint256 claimAmount = _getAvailableSalary(
+            config.amount,
+            claimTimestamp,
+            config.startTime,
+            config.endTime
+        ) - config.claimedAmount;
+
+        // claim avaliable funds
+        if (claimAmount > 0) {
+            uint256 fee = _getFeeAmount(employmentConfigId, config.feeReceiver, claimAmount);
+            IERC20(config.token).safeTransfer(config.developer, claimAmount - fee);
+
+            if (fee > 0) {
+                IERC20(config.token).safeTransfer(config.feeReceiver, fee);
+            }
         }
 
         // emit event
-        emit ClaimEmployment(config.id, config.token, amount);
+        emit ClaimSalary(config.id, config.token, claimAmount);
     }
 
     /// @inheritdoc IEmployWithConfig
     function getFeeFraction(
         string calldata employmentConfigId,
         address feeReceiver
-    ) external view override returns (uint256) {
+    ) external view override configIdNotEmpty(employmentConfigId) returns (uint256) {
         return _getFeeFraction(employmentConfigId, feeReceiver);
     }
 
@@ -184,16 +258,33 @@ contract EmployWithConfig is IEmployWithConfig, Initializable, ReentrancyGuard {
     function getFeeAmount(
         string calldata employmentConfigId,
         address feeReceiver,
-        uint256 tipAmount
-    ) external view override returns (uint256) {
-        return _getFeeAmount(employmentConfigId, feeReceiver, tipAmount);
+        uint256 amount
+    ) external view override configIdNotEmpty(employmentConfigId) returns (uint256) {
+        return _getFeeAmount(employmentConfigId, feeReceiver, amount);
     }
 
     /// @inheritdoc IEmployWithConfig
     function getEmploymentConfig(
         string calldata employmentConfigId
-    ) external view override returns (EmploymentConfig memory config) {
+    )
+        external
+        view
+        override
+        configIdNotEmpty(employmentConfigId)
+        returns (EmploymentConfig memory config)
+    {
         return _employmentConfigs[employmentConfigId];
+    }
+
+    /// @inheritdoc IEmployWithConfig
+    function getAvailableSalary(
+        string calldata employmentConfigId,
+        uint256 claimTimestamp
+    ) external view override configIdNotEmpty(employmentConfigId) returns (uint256) {
+        EmploymentConfig memory config = _employmentConfigs[employmentConfigId];
+        return
+            _getAvailableSalary(config.amount, claimTimestamp, config.startTime, config.endTime) -
+            config.claimedAmount;
     }
 
     function _getFeeFraction(
@@ -210,10 +301,25 @@ contract EmployWithConfig is IEmployWithConfig, Initializable, ReentrancyGuard {
     function _getFeeAmount(
         string calldata employmentConfigId,
         address feeReceiver,
-        uint256 tipAmount
+        uint256 amount
     ) internal view returns (uint256) {
         uint256 fraction = _getFeeFraction(employmentConfigId, feeReceiver);
-        return (tipAmount * fraction) / _feeDenominator();
+        return (amount * fraction) / _feeDenominator();
+    }
+
+    function _getAvailableSalary(
+        uint256 amount,
+        uint256 currentTime,
+        uint256 startTime,
+        uint256 endTime
+    ) internal pure returns (uint256) {
+        if (currentTime >= endTime) {
+            return amount;
+        } else if (currentTime <= startTime) {
+            return 0;
+        } else {
+            return (amount * (currentTime - startTime)) / (endTime - startTime);
+        }
     }
 
     /**
