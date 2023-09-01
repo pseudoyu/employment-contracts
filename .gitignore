@@ -24,3 +24,5 @@ flattened.txt
 node_modules
 out/
 docs/
+.deps
+compiler_config.json

@@ -3,13 +3,13 @@
 pragma solidity 0.8.18;
 
 /**
- * @title IEmployWithConfig
+ * @title ISkillsHub
  * @notice This is the interface for the EmployWithConfig contract.
  */
 
-interface IEmployWithConfig {
+interface ISkillsHub {
     struct EmploymentConfig {
-        string id;
+        uint256 id;
         address employer;
         address developer;
         address token;
@@ -36,7 +36,7 @@ interface IEmployWithConfig {
      * @param fraction The percentage measured in basis points. Each basis point represents 0.01%.
      */
     function setFeeFraction(
-        string calldata employmentConfigId,
+        uint256 employmentConfigId,
         address feeReceiver,
         uint256 fraction
     ) external;
@@ -46,7 +46,7 @@ interface IEmployWithConfig {
      * Emits a {SetEmploymentConfig} event.
      * @dev If the employment config of specific <fromCharacter, toCharacter> is already,
      * it will try to collect the employment first, and then override the employment config.
-     * @param employmentConfigId The employment signature.
+     * @param employmentConfigId The employment id.
      * @param develper The developer address.
      * @param token The token address.
      * @param amount The amount of token.
@@ -55,8 +55,8 @@ interface IEmployWithConfig {
      * @param feeReceiver The fee receiver address.
      */
     function setEmploymentConfig(
-        string calldata employmentConfigId,
-        string calldata prevEmploymentConfigId,
+        uint256 employmentConfigId,
+        uint256 prevEmploymentConfigId,
         address develper,
         address token,
         uint256 amount,
@@ -72,7 +72,7 @@ interface IEmployWithConfig {
      * @dev Only the employment creator can cancel the employment.
      * @param employmentConfigId The employment config ID to cancel.
      */
-    function cancelEmployment(string calldata employmentConfigId) external;
+    function cancelEmployment(uint256 employmentConfigId) external;
 
     /**
      * @notice Claims all unredeemed salary from the contract to developer address. <br>
@@ -81,7 +81,7 @@ interface IEmployWithConfig {
      * @param employmentConfigId The employment config ID.
      * @param claimTimestamp The claim time.
      */
-    function claimSalary(string calldata employmentConfigId, uint256 claimTimestamp) external;
+    function claimSalary(uint256 employmentConfigId, uint256 claimTimestamp) external;
 
     /**
      * @notice Returns the fee percentage of specific <receiver, employment>.
@@ -91,7 +91,7 @@ interface IEmployWithConfig {
      * @return fraction The percentage measured in basis points. Each basis point represents 0.01%.
      */
     function getFeeFraction(
-        string calldata employmentConfigId,
+        uint256 employmentConfigId,
         address feeReceiver
     ) external view returns (uint256);
 
@@ -103,7 +103,7 @@ interface IEmployWithConfig {
      * @return The fee amount.
      */
     function getFeeAmount(
-        string calldata employmentConfigId,
+        uint256 employmentConfigId,
         address feeReceiver,
         uint256 amount
     ) external view returns (uint256);
@@ -113,7 +113,7 @@ interface IEmployWithConfig {
      * @param employmentConfigId The employment config ID.
      */
     function getEmploymentConfig(
-        string calldata employmentConfigId
+        uint256 employmentConfigId
     ) external view returns (EmploymentConfig memory config);
 
     /**
@@ -124,7 +124,7 @@ interface IEmployWithConfig {
      * @return The available salary.
      */
     function getAvailableSalary(
-        string calldata employmentConfigId,
+        uint256 employmentConfigId,
         uint256 claimTimestamp
     ) external view returns (uint256);
 }

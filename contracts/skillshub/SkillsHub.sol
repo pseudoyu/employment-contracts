@@ -2,13 +2,13 @@
 // solhint-disable comprehensive-interface
 pragma solidity 0.8.18;
 
-import {IEmployWithConfig} from "../interfaces/IEmployWithConfig.sol";
+import {ISkillsHub} from "../interfaces/ISkillsHub.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 /**
- * @title EmployWithConfig
+ * @title SkillsHub
  * @notice Logic to handle the employemnt that the employer can set the employment config for a cooperation.,
  * @dev Employer can set config for a specific employment, and developer can claim the salary by config id.
  *
@@ -19,12 +19,12 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.
  * Anyone can claim the salary by employment id, and it will transfer all available tokens
  * from the contract account to the `developer` account.
  */
-contract EmployWithConfig is IEmployWithConfig, ReentrancyGuard {
+contract SkillsHub is ISkillsHub, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    mapping(string employmentConfigId => EmploymentConfig) internal _employmentConfigs;
+    mapping(uint256 employmentConfigId => EmploymentConfig) internal _employmentConfigs;
     mapping(address feeReceiver => uint256 fraction) internal _feeFractions;
-    mapping(address feeReceiver => mapping(string employmentConfigId => uint256 fraction))
+    mapping(address feeReceiver => mapping(uint256 employmentConfigId => uint256 fraction))
         internal _feeFractions4Employment;
     // slither-disable-end naming-convention
 
@@ -41,7 +41,7 @@ contract EmployWithConfig is IEmployWithConfig, ReentrancyGuard {
      * @param feeReceiver The fee receiver address.
      */
     event SetEmploymentConfig(
-        string indexed employmentConfigId,
+        uint256 indexed employmentConfigId,
         address indexed employerAddress,
         address indexed developerAddress,
         address token,
@@ -59,7 +59,7 @@ contract EmployWithConfig is IEmployWithConfig, ReentrancyGuard {
      * @param token The token address.
      * @param claimAmount The amount of token.
      */
-    event ClaimSalary(string indexed employmentConfigId, address token, uint256 claimAmount);
+    event ClaimSalary(uint256 indexed employmentConfigId, address token, uint256 claimAmount);
 
     /**
      * @dev Emitted when a developer claim the salary.
@@ -68,7 +68,7 @@ contract EmployWithConfig is IEmployWithConfig, ReentrancyGuard {
      * @param refundedAmount The amount of token.
      */
     event CancelEmployment(
-        string indexed employmentConfigId,
+        uint256 indexed employmentConfigId,
         address token,
         uint256 refundedAmount
     );
@@ -83,15 +83,12 @@ contract EmployWithConfig is IEmployWithConfig, ReentrancyGuard {
         _;
     }
 
-    modifier configIdNotEmpty(string calldata employmentConfigId) {
-        require(
-            bytes(employmentConfigId).length > 0,
-            "EmployWithConfig: employmentConfigId is empty"
-        );
+    modifier configIdNotEmpty(uint256 employmentConfigId) {
+        require(employmentConfigId > 0, "EmployWithConfig: employmentConfigId is empty");
         _;
     }
 
-    /// @inheritdoc IEmployWithConfig
+    /// @inheritdoc ISkillsHub
     function setDefaultFeeFraction(
         address feeReceiver,
         uint256 fraction
@@ -99,19 +96,19 @@ contract EmployWithConfig is IEmployWithConfig, ReentrancyGuard {
         _feeFractions[feeReceiver] = fraction;
     }
 
-    /// @inheritdoc IEmployWithConfig
+    /// @inheritdoc ISkillsHub
     function setFeeFraction(
-        string calldata employmentConfigId,
+        uint256 employmentConfigId,
         address feeReceiver,
         uint256 fraction
     ) external override onlyFeeReceiver(feeReceiver) validateFraction(fraction) {
         _feeFractions4Employment[feeReceiver][employmentConfigId] = fraction;
     }
 
-    /// @inheritdoc IEmployWithConfig
+    /// @inheritdoc ISkillsHub
     function setEmploymentConfig(
-        string calldata employmentConfigId,
-        string calldata prevEmploymentConfigId,
+        uint256 employmentConfigId,
+        uint256 prevEmploymentConfigId,
         address developer,
         address token,
         uint256 amount,
@@ -125,7 +122,7 @@ contract EmployWithConfig is IEmployWithConfig, ReentrancyGuard {
         uint256 refundedAmount;
         uint256 additonalAmount;
 
-        if (bytes(prevEmploymentConfigId).length > 0) {
+        if (prevEmploymentConfigId > 0) {
             EmploymentConfig storage prevConfig = _employmentConfigs[prevEmploymentConfigId];
 
             // add new employments config
@@ -192,9 +189,9 @@ contract EmployWithConfig is IEmployWithConfig, ReentrancyGuard {
         );
     }
 
-    /// @inheritdoc IEmployWithConfig
+    /// @inheritdoc ISkillsHub
     function cancelEmployment(
-        string calldata employmentConfigId
+        uint256 employmentConfigId
     ) external override configIdNotEmpty(employmentConfigId) {
         EmploymentConfig storage config = _employmentConfigs[employmentConfigId];
         require(msg.sender == config.employer, "EmployWithConfig: not employer");
@@ -214,9 +211,9 @@ contract EmployWithConfig is IEmployWithConfig, ReentrancyGuard {
         emit CancelEmployment(config.id, config.token, config.amount - config.claimedAmount);
     }
 
-    // @inheritdoc IEmployWithConfig
+    // @inheritdoc ISkillsHub
     function claimSalary(
-        string calldata employmentConfigId,
+        uint256 employmentConfigId,
         uint256 claimTimestamp
     ) external override configIdNotEmpty(employmentConfigId) nonReentrant {
         EmploymentConfig storage config = _employmentConfigs[employmentConfigId];
@@ -245,26 +242,26 @@ contract EmployWithConfig is IEmployWithConfig, ReentrancyGuard {
         emit ClaimSalary(config.id, config.token, claimAmount);
     }
 
-    /// @inheritdoc IEmployWithConfig
+    /// @inheritdoc ISkillsHub
     function getFeeFraction(
-        string calldata employmentConfigId,
+        uint256 employmentConfigId,
         address feeReceiver
     ) external view override configIdNotEmpty(employmentConfigId) returns (uint256) {
         return _getFeeFraction(employmentConfigId, feeReceiver);
     }
 
-    /// @inheritdoc IEmployWithConfig
+    /// @inheritdoc ISkillsHub
     function getFeeAmount(
-        string calldata employmentConfigId,
+        uint256 employmentConfigId,
         address feeReceiver,
         uint256 amount
     ) external view override configIdNotEmpty(employmentConfigId) returns (uint256) {
         return _getFeeAmount(employmentConfigId, feeReceiver, amount);
     }
 
-    /// @inheritdoc IEmployWithConfig
+    /// @inheritdoc ISkillsHub
     function getEmploymentConfig(
-        string calldata employmentConfigId
+        uint256 employmentConfigId
     )
         external
         view
@@ -275,9 +272,9 @@ contract EmployWithConfig is IEmployWithConfig, ReentrancyGuard {
         return _employmentConfigs[employmentConfigId];
     }
 
-    /// @inheritdoc IEmployWithConfig
+    /// @inheritdoc ISkillsHub
     function getAvailableSalary(
-        string calldata employmentConfigId,
+        uint256 employmentConfigId,
         uint256 claimTimestamp
     ) external view override configIdNotEmpty(employmentConfigId) returns (uint256) {
         EmploymentConfig memory config = _employmentConfigs[employmentConfigId];
@@ -287,7 +284,7 @@ contract EmployWithConfig is IEmployWithConfig, ReentrancyGuard {
     }
 
     function _getFeeFraction(
-        string calldata employmentConfigId,
+        uint256 employmentConfigId,
         address feeReceiver
     ) internal view returns (uint256) {
         // get character fraction
@@ -298,7 +295,7 @@ contract EmployWithConfig is IEmployWithConfig, ReentrancyGuard {
     }
 
     function _getFeeAmount(
-        string calldata employmentConfigId,
+        uint256 employmentConfigId,
         address feeReceiver,
         uint256 amount
     ) internal view returns (uint256) {
