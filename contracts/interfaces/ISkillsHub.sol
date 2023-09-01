@@ -57,13 +57,15 @@ interface ISkillsHub {
      * @param amount The amount of token.
      * @param startTime The start time of employment.
      * @param endTime The end time of employment.
+     * @param signature The signature of the message.
      */
     function setEmploymentConfig(
         address develper,
         address token,
         uint256 amount,
         uint256 startTime,
-        uint256 endTime
+        uint256 endTime,
+        bytes memory signature
     ) external;
 
     /**
@@ -72,8 +74,13 @@ interface ISkillsHub {
      * @dev It will try to collect the employment first, and then update the employment config.
      * @param employmentConfigId The employment config ID to update.
      * @param endTime The end time of employment.
+     * @param signature The signature of the message.
      */
-    function renewalEmploymentConfig(uint256 employmentConfigId, uint256 endTime) external;
+    function renewalEmploymentConfig(
+        uint256 employmentConfigId,
+        uint256 endTime,
+        bytes memory signature
+    ) external;
 
     /**
      * @notice Cancels the employment. <br>
@@ -136,4 +143,21 @@ interface ISkillsHub {
         uint256 employmentConfigId,
         uint256 claimTimestamp
     ) external view returns (uint256);
+
+    /**
+     * @notice Returns the verify signature result.
+     * @dev It will return the verify signature result.
+     * @param developer The signer address(developer).
+     * @param employer The employer address.
+     * @param startTime The start time of employment.
+     * @param endTime The end time of employment.
+     * @param signature The signature of the message.
+     */
+    function verifySignature(
+        address developer,
+        address employer,
+        uint256 startTime,
+        uint256 endTime,
+        bytes memory signature
+    ) external pure returns (bool);
 }

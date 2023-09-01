@@ -3,6 +3,7 @@
 pragma solidity 0.8.18;
 
 import {ISkillsHub} from "../interfaces/ISkillsHub.sol";
+import {VerifySignature} from "../libraries/VerifySignature.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
@@ -107,6 +108,20 @@ contract SkillsHub is ISkillsHub, Initializable, ReentrancyGuard {
         _;
     }
 
+    modifier vaildSignature(
+        address developer,
+        address employer,
+        uint256 startTime,
+        uint256 endTime,
+        bytes memory signature
+    ) {
+        require(
+            _verifySignature(developer, employer, startTime, endTime, signature),
+            "EmployWithConfig: invalid signature"
+        );
+        _;
+    }
+
     /// @inheritdoc ISkillsHub
     function initialize(address feeReceiver_) external override initializer {
         _feeReceiver = feeReceiver_;
@@ -135,8 +150,9 @@ contract SkillsHub is ISkillsHub, Initializable, ReentrancyGuard {
         address token,
         uint256 amount,
         uint256 startTime,
-        uint256 endTime
-    ) external override {
+        uint256 endTime,
+        bytes memory signature
+    ) external override vaildSignature(developer, msg.sender, startTime, endTime, signature) {
         require(endTime > startTime, "EmployWithConfig: end time must be greater than start time");
         require(amount > 0, "EmployWithConfig: amount must be greater than zero");
 
@@ -172,9 +188,14 @@ contract SkillsHub is ISkillsHub, Initializable, ReentrancyGuard {
     /// @inheritdoc ISkillsHub
     function renewalEmploymentConfig(
         uint256 employmentConfigId,
-        uint256 endTime
+        uint256 endTime,
+        bytes memory signature
     ) external override validEmploymentId(employmentConfigId) {
         EmploymentConfig storage config = _employmentConfigs[employmentConfigId];
+        require(
+            _verifySignature(config.developer, msg.sender, config.startTime, endTime, signature),
+            "EmployWithConfig: invalid signature"
+        );
         require(msg.sender == config.employer, "EmployWithConfig: not employer");
         require(block.timestamp < config.endTime, "EmployWithConfig: project already ended");
         require(
@@ -260,6 +281,16 @@ contract SkillsHub is ISkillsHub, Initializable, ReentrancyGuard {
         emit ClaimSalary(config.id, config.token, claimAmount, config.lastClaimedTime);
     }
 
+    function _verifySignature(
+        address developer,
+        address employer,
+        uint256 startTime,
+        uint256 endTime,
+        bytes memory signature
+    ) internal pure returns (bool) {
+        return VerifySignature.verify(developer, employer, startTime, endTime, signature);
+    }
+
     /// @inheritdoc ISkillsHub
     function getFeeFraction(
         uint256 employmentConfigId,
@@ -299,6 +330,17 @@ contract SkillsHub is ISkillsHub, Initializable, ReentrancyGuard {
         return
             _getAvailableSalary(config.amount, claimTimestamp, config.startTime, config.endTime) -
             config.claimedAmount;
+    }
+
+    /// @inheritdoc ISkillsHub
+    function verifySignature(
+        address developer,
+        address employer,
+        uint256 startTime,
+        uint256 endTime,
+        bytes memory signature
+    ) external pure override returns (bool) {
+        return _verifySignature(developer, employer, startTime, endTime, signature);
     }
 
     function _getFeeFraction(
