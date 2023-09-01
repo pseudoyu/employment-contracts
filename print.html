@@ -180,9 +180,18 @@
 <li><a href="contracts/interfaces/ISkillsHub.sol/interface.ISkillsHub.html">ISkillsHub</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="iskillshub"><a class="header" href="#iskillshub">ISkillsHub</a></h1>
-<p><a href="https://github.com/pseudoyu/openbuild-contracts/blob/abf662c87da5f0e870c9cad3c96bd3934e26ffbc/contracts/interfaces/ISkillsHub.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/openbuild-contracts/blob/61e1cb80fd109ae99df2170cd5f6a10f1566350a/contracts/interfaces/ISkillsHub.sol">Git Source</a></p>
 <p>This is the interface for the EmployWithConfig contract.</p>
 <h2 id="functions"><a class="header" href="#functions">Functions</a></h2>
+<h3 id="initialize"><a class="header" href="#initialize">initialize</a></h3>
+<p>Initialize the contract, setting web3Entry address.</p>
+<pre><code class="language-solidity">function initialize(address feeReceiver_) external;
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>feeReceiver_</code></td><td><code>address</code></td><td>Address of web3Entry.</td></tr>
+</tbody></table>
+</div>
 <h3 id="setdefaultfeefraction"><a class="header" href="#setdefaultfeefraction">setDefaultFeeFraction</a></h3>
 <p>Sets the default fee percentage of specific receiver.</p>
 <p><em>The feeReceiver can be a platform account.</em></p>
@@ -211,27 +220,28 @@
 Emits a {SetEmploymentConfig} event.</p>
 <p><em>If the employment config of specific &lt;fromCharacter, toCharacter&gt; is already,
 it will try to collect the employment first, and then override the employment config.</em></p>
-<pre><code class="language-solidity">function setEmploymentConfig(
-    uint256 employmentConfigId,
-    uint256 prevEmploymentConfigId,
-    address develper,
-    address token,
-    uint256 amount,
-    uint256 startTime,
-    uint256 endTime,
-    address feeReceiver
-) external;
+<pre><code class="language-solidity">function setEmploymentConfig(address develper, address token, uint256 amount, uint256 startTime, uint256 endTime)
+    external;
 </code></pre>
 <p><strong>Parameters</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>employmentConfigId</code></td><td><code>uint256</code></td><td>The employment id.</td></tr>
-<tr><td><code>prevEmploymentConfigId</code></td><td><code>uint256</code></td><td></td></tr>
 <tr><td><code>develper</code></td><td><code>address</code></td><td>The developer address.</td></tr>
 <tr><td><code>token</code></td><td><code>address</code></td><td>The token address.</td></tr>
 <tr><td><code>amount</code></td><td><code>uint256</code></td><td>The amount of token.</td></tr>
 <tr><td><code>startTime</code></td><td><code>uint256</code></td><td>The start time of employment.</td></tr>
 <tr><td><code>endTime</code></td><td><code>uint256</code></td><td>The end time of employment.</td></tr>
-<tr><td><code>feeReceiver</code></td><td><code>address</code></td><td>The fee receiver address.</td></tr>
+</tbody></table>
+</div>
+<h3 id="renewalemploymentconfig"><a class="header" href="#renewalemploymentconfig">renewalEmploymentConfig</a></h3>
+<p>Updates the employment config of specific employment id. <br>
+Emits a {UpdateEmploymentConfig} event.</p>
+<p><em>It will try to collect the employment first, and then update the employment config.</em></p>
+<pre><code class="language-solidity">function renewalEmploymentConfig(uint256 employmentConfigId, uint256 endTime) external;
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>employmentConfigId</code></td><td><code>uint256</code></td><td>The employment config ID to update.</td></tr>
+<tr><td><code>endTime</code></td><td><code>uint256</code></td><td>The end time of employment.</td></tr>
 </tbody></table>
 </div>
 <h3 id="cancelemployment"><a class="header" href="#cancelemployment">cancelEmployment</a></h3>
@@ -250,12 +260,11 @@ Emits a {CancelEmployment} event.</p>
 <p>Claims all unredeemed salary from the contract to developer address. <br>
 Emits a {ClaimEmployment} event if claims successfully.</p>
 <p><em>It will transfer all unredeemed token from the contract to the <code>developer</code>.</em></p>
-<pre><code class="language-solidity">function claimSalary(uint256 employmentConfigId, uint256 claimTimestamp) external;
+<pre><code class="language-solidity">function claimSalary(uint256 employmentConfigId) external;
 </code></pre>
 <p><strong>Parameters</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
 <tr><td><code>employmentConfigId</code></td><td><code>uint256</code></td><td>The employment config ID.</td></tr>
-<tr><td><code>claimTimestamp</code></td><td><code>uint256</code></td><td>The claim time.</td></tr>
 </tbody></table>
 </div>
 <h3 id="getfeefraction"><a class="header" href="#getfeefraction">getFeeFraction</a></h3>
@@ -329,7 +338,7 @@ Emits a {ClaimEmployment} event if claims successfully.</p>
     uint256 claimedAmount;
     uint256 startTime;
     uint256 endTime;
-    address feeReceiver;
+    uint256 lastClaimedTime;
 }
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="contents-1"><a class="header" href="#contents-1">Contents</a></h1>
@@ -337,9 +346,9 @@ Emits a {ClaimEmployment} event if claims successfully.</p>
 <li><a href="contracts/skillshub/SkillsHub.sol/contract.SkillsHub.html">SkillsHub</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="skillshub"><a class="header" href="#skillshub">SkillsHub</a></h1>
-<p><a href="https://github.com/pseudoyu/openbuild-contracts/blob/abf662c87da5f0e870c9cad3c96bd3934e26ffbc/contracts/skillshub/SkillsHub.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/openbuild-contracts/blob/61e1cb80fd109ae99df2170cd5f6a10f1566350a/contracts/skillshub/SkillsHub.sol">Git Source</a></p>
 <p><strong>Inherits:</strong>
-<a href="contracts/skillshub/SkillsHub.sol//contracts/interfaces/ISkillsHub.sol/interface.ISkillsHub.html">ISkillsHub</a>, ReentrancyGuard</p>
+<a href="contracts/skillshub/SkillsHub.sol//contracts/interfaces/ISkillsHub.sol/interface.ISkillsHub.html">ISkillsHub</a>, Initializable, ReentrancyGuard</p>
 <p>Logic to handle the employemnt that the employer can set the employment config for a cooperation.,</p>
 <p><em>Employer can set config for a specific employment, and developer can claim the salary by config id.
 For <code>SetEmploymentConfig</code>
@@ -348,6 +357,12 @@ For <code>claimSalary</code>
 Anyone can claim the salary by employment id, and it will transfer all available tokens
 from the contract account to the <code>developer</code> account.</em></p>
 <h2 id="state-variables"><a class="header" href="#state-variables">State Variables</a></h2>
+<h3 id="_feereceiver"><a class="header" href="#_feereceiver">_feeReceiver</a></h3>
+<pre><code class="language-solidity">address internal _feeReceiver;
+</code></pre>
+<h3 id="_employmentconfigindex"><a class="header" href="#_employmentconfigindex">_employmentConfigIndex</a></h3>
+<pre><code class="language-solidity">uint256 internal _employmentConfigIndex;
+</code></pre>
 <h3 id="_employmentconfigs"><a class="header" href="#_employmentconfigs">_employmentConfigs</a></h3>
 <pre><code class="language-solidity">mapping(uint256 employmentConfigId =&gt; EmploymentConfig) internal _employmentConfigs;
 </code></pre>
@@ -365,9 +380,18 @@ from the contract account to the <code>developer</code> account.</em></p>
 <h3 id="validatefraction"><a class="header" href="#validatefraction">validateFraction</a></h3>
 <pre><code class="language-solidity">modifier validateFraction(uint256 fraction);
 </code></pre>
-<h3 id="configidnotempty"><a class="header" href="#configidnotempty">configIdNotEmpty</a></h3>
-<pre><code class="language-solidity">modifier configIdNotEmpty(uint256 employmentConfigId);
+<h3 id="validemploymentid"><a class="header" href="#validemploymentid">validEmploymentId</a></h3>
+<pre><code class="language-solidity">modifier validEmploymentId(uint256 employmentConfigId);
 </code></pre>
+<h3 id="initialize-1"><a class="header" href="#initialize-1">initialize</a></h3>
+<p>Initialize the contract, setting web3Entry address.</p>
+<pre><code class="language-solidity">function initialize(address feeReceiver_) external override initializer;
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>feeReceiver_</code></td><td><code>address</code></td><td>Address of web3Entry.</td></tr>
+</tbody></table>
+</div>
 <h3 id="setdefaultfeefraction-1"><a class="header" href="#setdefaultfeefraction-1">setDefaultFeeFraction</a></h3>
 <p>Sets the default fee percentage of specific receiver.</p>
 <p><em>The feeReceiver can be a platform account.</em></p>
@@ -404,34 +428,39 @@ from the contract account to the <code>developer</code> account.</em></p>
 Emits a {SetEmploymentConfig} event.</p>
 <p><em>If the employment config of specific &lt;fromCharacter, toCharacter&gt; is already,
 it will try to collect the employment first, and then override the employment config.</em></p>
-<pre><code class="language-solidity">function setEmploymentConfig(
-    uint256 employmentConfigId,
-    uint256 prevEmploymentConfigId,
-    address developer,
-    address token,
-    uint256 amount,
-    uint256 startTime,
-    uint256 endTime,
-    address feeReceiver
-) external override configIdNotEmpty(employmentConfigId);
+<pre><code class="language-solidity">function setEmploymentConfig(address developer, address token, uint256 amount, uint256 startTime, uint256 endTime)
+    external
+    override;
 </code></pre>
 <p><strong>Parameters</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>employmentConfigId</code></td><td><code>uint256</code></td><td>The employment id.</td></tr>
-<tr><td><code>prevEmploymentConfigId</code></td><td><code>uint256</code></td><td></td></tr>
 <tr><td><code>developer</code></td><td><code>address</code></td><td></td></tr>
 <tr><td><code>token</code></td><td><code>address</code></td><td>The token address.</td></tr>
 <tr><td><code>amount</code></td><td><code>uint256</code></td><td>The amount of token.</td></tr>
 <tr><td><code>startTime</code></td><td><code>uint256</code></td><td>The start time of employment.</td></tr>
 <tr><td><code>endTime</code></td><td><code>uint256</code></td><td>The end time of employment.</td></tr>
-<tr><td><code>feeReceiver</code></td><td><code>address</code></td><td>The fee receiver address.</td></tr>
+</tbody></table>
+</div>
+<h3 id="renewalemploymentconfig-1"><a class="header" href="#renewalemploymentconfig-1">renewalEmploymentConfig</a></h3>
+<p>Updates the employment config of specific employment id. <br>
+Emits a {UpdateEmploymentConfig} event.</p>
+<p><em>It will try to collect the employment first, and then update the employment config.</em></p>
+<pre><code class="language-solidity">function renewalEmploymentConfig(uint256 employmentConfigId, uint256 endTime)
+    external
+    override
+    validEmploymentId(employmentConfigId);
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>employmentConfigId</code></td><td><code>uint256</code></td><td>The employment config ID to update.</td></tr>
+<tr><td><code>endTime</code></td><td><code>uint256</code></td><td>The end time of employment.</td></tr>
 </tbody></table>
 </div>
 <h3 id="cancelemployment-1"><a class="header" href="#cancelemployment-1">cancelEmployment</a></h3>
 <p>Cancels the employment. <br>
 Emits a {CancelEmployment} event.</p>
 <p><em>It will try to collect the remaining assets first, and then delete the employment config.</em></p>
-<pre><code class="language-solidity">function cancelEmployment(uint256 employmentConfigId) external override configIdNotEmpty(employmentConfigId);
+<pre><code class="language-solidity">function cancelEmployment(uint256 employmentConfigId) external override validEmploymentId(employmentConfigId);
 </code></pre>
 <p><strong>Parameters</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
@@ -439,11 +468,7 @@ Emits a {CancelEmployment} event.</p>
 </tbody></table>
 </div>
 <h3 id="claimsalary-1"><a class="header" href="#claimsalary-1">claimSalary</a></h3>
-<pre><code class="language-solidity">function claimSalary(uint256 employmentConfigId, uint256 claimTimestamp)
-    external
-    override
-    configIdNotEmpty(employmentConfigId)
-    nonReentrant;
+<pre><code class="language-solidity">function claimSalary(uint256 employmentConfigId) external override validEmploymentId(employmentConfigId) nonReentrant;
 </code></pre>
 <h3 id="getfeefraction-1"><a class="header" href="#getfeefraction-1">getFeeFraction</a></h3>
 <p>Returns the fee percentage of specific &lt;receiver, employment&gt;.</p>
@@ -452,7 +477,7 @@ Emits a {CancelEmployment} event.</p>
     external
     view
     override
-    configIdNotEmpty(employmentConfigId)
+    validEmploymentId(employmentConfigId)
     returns (uint256);
 </code></pre>
 <p><strong>Parameters</strong></p>
@@ -472,7 +497,7 @@ Emits a {CancelEmployment} event.</p>
     external
     view
     override
-    configIdNotEmpty(employmentConfigId)
+    validEmploymentId(employmentConfigId)
     returns (uint256);
 </code></pre>
 <p><strong>Parameters</strong></p>
@@ -493,7 +518,7 @@ Emits a {CancelEmployment} event.</p>
     external
     view
     override
-    configIdNotEmpty(employmentConfigId)
+    validEmploymentId(employmentConfigId)
     returns (EmploymentConfig memory config);
 </code></pre>
 <p><strong>Parameters</strong></p>
@@ -508,7 +533,7 @@ Emits a {CancelEmployment} event.</p>
     external
     view
     override
-    configIdNotEmpty(employmentConfigId)
+    validEmploymentId(employmentConfigId)
     returns (uint256);
 </code></pre>
 <p><strong>Parameters</strong></p>
@@ -550,16 +575,25 @@ Emits a {CancelEmployment} event.</p>
     address indexed developerAddress,
     address token,
     uint256 amount,
-    uint256 refundedAmount,
+    uint256 startTime,
+    uint256 endTime
+);
+</code></pre>
+<h3 id="renewalemploymentconfig-2"><a class="header" href="#renewalemploymentconfig-2">RenewalEmploymentConfig</a></h3>
+<pre><code class="language-solidity">event RenewalEmploymentConfig(
+    uint256 indexed employmentConfigId,
+    address indexed employerAddress,
+    address indexed developerAddress,
+    address token,
+    uint256 amount,
     uint256 additonalAmount,
     uint256 startTime,
-    uint256 endTime,
-    address feeReceiver
+    uint256 endTime
 );
 </code></pre>
 <h3 id="claimsalary-2"><a class="header" href="#claimsalary-2">ClaimSalary</a></h3>
 <p><em>Emitted when a developer claim the salary.</em></p>
-<pre><code class="language-solidity">event ClaimSalary(uint256 indexed employmentConfigId, address token, uint256 claimAmount);
+<pre><code class="language-solidity">event ClaimSalary(uint256 indexed employmentConfigId, address token, uint256 claimAmount, uint256 lastClaimedTime);
 </code></pre>
 <h3 id="cancelemployment-2"><a class="header" href="#cancelemployment-2">CancelEmployment</a></h3>
 <p><em>Emitted when a developer claim the salary.</em></p>
@@ -570,7 +604,7 @@ Emits a {CancelEmployment} event.</p>
 <li><a href="contracts/token/OpenBuildToken.sol/contract.OpenBuildToken.html">OpenBuildToken</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="openbuildtoken"><a class="header" href="#openbuildtoken">OpenBuildToken</a></h1>
-<p><a href="https://github.com/pseudoyu/openbuild-contracts/blob/abf662c87da5f0e870c9cad3c96bd3934e26ffbc/contracts/token/OpenBuildToken.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/openbuild-contracts/blob/61e1cb80fd109ae99df2170cd5f6a10f1566350a/contracts/token/OpenBuildToken.sol">Git Source</a></p>
 <p><strong>Inherits:</strong>
 ERC20</p>
 <h2 id="functions-2"><a class="header" href="#functions-2">Functions</a></h2>
