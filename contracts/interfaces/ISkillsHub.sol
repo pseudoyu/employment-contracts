@@ -17,8 +17,14 @@ interface ISkillsHub {
         uint256 claimedAmount;
         uint256 startTime;
         uint256 endTime;
-        address feeReceiver;
+        uint256 lastClaimedTime;
     }
+
+    /**
+     * @notice Initialize the contract, setting web3Entry address.
+     * @param feeReceiver_ Address of web3Entry.
+     */
+    function initialize(address feeReceiver_) external;
 
     /**
      * @notice Sets the default fee percentage of specific receiver.
@@ -46,24 +52,28 @@ interface ISkillsHub {
      * Emits a {SetEmploymentConfig} event.
      * @dev If the employment config of specific <fromCharacter, toCharacter> is already,
      * it will try to collect the employment first, and then override the employment config.
-     * @param employmentConfigId The employment id.
      * @param develper The developer address.
      * @param token The token address.
      * @param amount The amount of token.
      * @param startTime The start time of employment.
      * @param endTime The end time of employment.
-     * @param feeReceiver The fee receiver address.
      */
     function setEmploymentConfig(
-        uint256 employmentConfigId,
-        uint256 prevEmploymentConfigId,
         address develper,
         address token,
         uint256 amount,
         uint256 startTime,
-        uint256 endTime,
-        address feeReceiver
+        uint256 endTime
     ) external;
+
+    /**
+     * @notice Updates the employment config of specific employment id. <br>
+     * Emits a {UpdateEmploymentConfig} event.
+     * @dev It will try to collect the employment first, and then update the employment config.
+     * @param employmentConfigId The employment config ID to update.
+     * @param endTime The end time of employment.
+     */
+    function renewalEmploymentConfig(uint256 employmentConfigId, uint256 endTime) external;
 
     /**
      * @notice Cancels the employment. <br>
@@ -79,9 +89,8 @@ interface ISkillsHub {
      * Emits a {ClaimEmployment} event if claims successfully.
      * @dev It will transfer all unredeemed token from the contract to the `developer`.
      * @param employmentConfigId The employment config ID.
-     * @param claimTimestamp The claim time.
      */
-    function claimSalary(uint256 employmentConfigId, uint256 claimTimestamp) external;
+    function claimSalary(uint256 employmentConfigId) external;
 
     /**
      * @notice Returns the fee percentage of specific <receiver, employment>.
