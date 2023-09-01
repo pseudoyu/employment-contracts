@@ -6,10 +6,10 @@
 import { ethers } from "hardhat";
 
 async function main() {
-    const EmploymentWithConfig = await ethers.getContractFactory("EmployWithConfig");
-    const employmentWithConfig = await EmploymentWithConfig.deploy();
+    const SkillsHub = await ethers.getContractFactory("SkillsHub");
+    const skillsHub = await SkillsHub.deploy();
 
-    console.log("employmentWithConfig deployed to:", employmentWithConfig.address);
+    console.log("skillsHub deployed to:", skillsHub.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
