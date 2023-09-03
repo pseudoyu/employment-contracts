@@ -85,7 +85,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item "><a href="index.html">Home</a></li><li class="chapter-item affix "><li class="part-title">contracts</li><li class="chapter-item "><a href="contracts/interfaces/index.html">❱ interfaces</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="contracts/interfaces/ISkillsHub.sol/interface.ISkillsHub.html">ISkillsHub</a></li></ol></li><li class="chapter-item "><a href="contracts/libraries/index.html">❱ libraries</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="contracts/libraries/VerifySignature.sol/library.VerifySignature.html">VerifySignature</a></li></ol></li><li class="chapter-item "><a href="contracts/skillshub/index.html">❱ skillshub</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="contracts/skillshub/SkillsHub.sol/contract.SkillsHub.html">SkillsHub</a></li></ol></li><li class="chapter-item "><a href="contracts/token/index.html">❱ token</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="contracts/token/OpenBuildToken.sol/contract.OpenBuildToken.html">OpenBuildToken</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item "><a href="index.html">Home</a></li><li class="chapter-item affix "><li class="part-title">contracts</li><li class="chapter-item "><a href="contracts/interfaces/index.html">❱ interfaces</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="contracts/interfaces/ISkillsHub.sol/interface.ISkillsHub.html">ISkillsHub</a></li></ol></li><li class="chapter-item "><a href="contracts/skillshub/index.html">❱ skillshub</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="contracts/skillshub/SkillsHub.sol/contract.SkillsHub.html">SkillsHub</a></li><li class="chapter-item "><a href="contracts/skillshub/Verifier.sol/abstract.Verifier.html">Verifier</a></li></ol></li><li class="chapter-item "><a href="contracts/token/index.html">❱ token</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="contracts/token/OpenBuildToken.sol/contract.OpenBuildToken.html">OpenBuildToken</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -180,7 +180,7 @@
 <li><a href="contracts/interfaces/ISkillsHub.sol/interface.ISkillsHub.html">ISkillsHub</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="iskillshub"><a class="header" href="#iskillshub">ISkillsHub</a></h1>
-<p><a href="https://github.com/pseudoyu/openbuild-contracts/blob/df8e29fd3f600291e954b5716e072b1a80aa1105/contracts/interfaces/ISkillsHub.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/openbuild-contracts/blob/6276b992f3d046c08932c21375cd358fb5a90647/contracts/interfaces/ISkillsHub.sol">Git Source</a></p>
 <p>This is the interface for the EmployWithConfig contract.</p>
 <h2 id="functions"><a class="header" href="#functions">Functions</a></h2>
 <h3 id="initialize"><a class="header" href="#initialize">initialize</a></h3>
@@ -335,26 +335,6 @@ Emits a {ClaimEmployment} event if claims successfully.</p>
 <tr><td><code>&lt;none&gt;</code></td><td><code>uint256</code></td><td>The available salary.</td></tr>
 </tbody></table>
 </div>
-<h3 id="verifysignature"><a class="header" href="#verifysignature">verifySignature</a></h3>
-<p>Returns the verify signature result.</p>
-<p><em>It will return the verify signature result.</em></p>
-<pre><code class="language-solidity">function verifySignature(
-    address developer,
-    address employer,
-    uint256 startTime,
-    uint256 endTime,
-    bytes memory signature
-) external pure returns (bool);
-</code></pre>
-<p><strong>Parameters</strong></p>
-<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>developer</code></td><td><code>address</code></td><td>The signer address(developer).</td></tr>
-<tr><td><code>employer</code></td><td><code>address</code></td><td>The employer address.</td></tr>
-<tr><td><code>startTime</code></td><td><code>uint256</code></td><td>The start time of employment.</td></tr>
-<tr><td><code>endTime</code></td><td><code>uint256</code></td><td>The end time of employment.</td></tr>
-<tr><td><code>signature</code></td><td><code>bytes</code></td><td>The signature of the message.</td></tr>
-</tbody></table>
-</div>
 <h2 id="structs"><a class="header" href="#structs">Structs</a></h2>
 <h3 id="employmentconfig"><a class="header" href="#employmentconfig">EmploymentConfig</a></h3>
 <pre><code class="language-solidity">struct EmploymentConfig {
@@ -371,37 +351,13 @@ Emits a {ClaimEmployment} event if claims successfully.</p>
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="contents-1"><a class="header" href="#contents-1">Contents</a></h1>
 <ul>
-<li><a href="contracts/libraries/VerifySignature.sol/library.VerifySignature.html">VerifySignature</a></li>
-</ul>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="verifysignature-1"><a class="header" href="#verifysignature-1">VerifySignature</a></h1>
-<p><a href="https://github.com/pseudoyu/openbuild-contracts/blob/df8e29fd3f600291e954b5716e072b1a80aa1105/contracts/libraries/VerifySignature.sol">Git Source</a></p>
-<h2 id="functions-1"><a class="header" href="#functions-1">Functions</a></h2>
-<h3 id="getmessagehash"><a class="header" href="#getmessagehash">getMessageHash</a></h3>
-<pre><code class="language-solidity">function getMessageHash(address employer, uint256 startTime, uint256 endTime) internal pure returns (bytes32);
-</code></pre>
-<h3 id="getethsignedmessagehash"><a class="header" href="#getethsignedmessagehash">getEthSignedMessageHash</a></h3>
-<pre><code class="language-solidity">function getEthSignedMessageHash(bytes32 messageHash) internal pure returns (bytes32);
-</code></pre>
-<h3 id="verify"><a class="header" href="#verify">verify</a></h3>
-<pre><code class="language-solidity">function verify(address signer, address employer, uint256 startTime, uint256 endTime, bytes memory signature)
-    internal
-    pure
-    returns (bool);
-</code></pre>
-<h3 id="recoversigner"><a class="header" href="#recoversigner">recoverSigner</a></h3>
-<pre><code class="language-solidity">function recoverSigner(bytes32 ethSignedMessageHash, bytes memory signature) internal pure returns (address);
-</code></pre>
-<h3 id="splitsignature"><a class="header" href="#splitsignature">splitSignature</a></h3>
-<pre><code class="language-solidity">function splitSignature(bytes memory sig) internal pure returns (bytes32 r, bytes32 s, uint8 v);
-</code></pre>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="contents-2"><a class="header" href="#contents-2">Contents</a></h1>
-<ul>
 <li><a href="contracts/skillshub/SkillsHub.sol/contract.SkillsHub.html">SkillsHub</a></li>
+<li><a href="contracts/skillshub/Verifier.sol/abstract.Verifier.html">Verifier</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="skillshub"><a class="header" href="#skillshub">SkillsHub</a></h1>
-<p><a href="https://github.com/pseudoyu/openbuild-contracts/blob/df8e29fd3f600291e954b5716e072b1a80aa1105/contracts/skillshub/SkillsHub.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/openbuild-contracts/blob/6276b992f3d046c08932c21375cd358fb5a90647/contracts/skillshub/SkillsHub.sol">Git Source</a></p>
 <p><strong>Inherits:</strong>
-<a href="contracts/skillshub/SkillsHub.sol//contracts/interfaces/ISkillsHub.sol/interface.ISkillsHub.html">ISkillsHub</a>, Initializable, ReentrancyGuard</p>
+<a href="contracts/skillshub/SkillsHub.sol//contracts/skillshub/Verifier.sol/abstract.Verifier.html">Verifier</a>, <a href="contracts/skillshub/SkillsHub.sol//contracts/interfaces/ISkillsHub.sol/interface.ISkillsHub.html">ISkillsHub</a>, Initializable, ReentrancyGuard</p>
 <p>Logic to handle the employemnt that the employer can set the employment config for a cooperation.,</p>
 <p><em>Employer can set config for a specific employment, and developer can claim the salary by config id.
 For <code>SetEmploymentConfig</code>
@@ -426,7 +382,7 @@ from the contract account to the <code>developer</code> account.</em></p>
 <pre><code class="language-solidity">mapping(address feeReceiver =&gt; mapping(uint256 employmentConfigId =&gt; uint256 fraction)) internal
     _feeFractions4Employment;
 </code></pre>
-<h2 id="functions-2"><a class="header" href="#functions-2">Functions</a></h2>
+<h2 id="functions-1"><a class="header" href="#functions-1">Functions</a></h2>
 <h3 id="onlyfeereceiver"><a class="header" href="#onlyfeereceiver">onlyFeeReceiver</a></h3>
 <pre><code class="language-solidity">modifier onlyFeeReceiver(address feeReceiver);
 </code></pre>
@@ -435,15 +391,6 @@ from the contract account to the <code>developer</code> account.</em></p>
 </code></pre>
 <h3 id="validemploymentid"><a class="header" href="#validemploymentid">validEmploymentId</a></h3>
 <pre><code class="language-solidity">modifier validEmploymentId(uint256 employmentConfigId);
-</code></pre>
-<h3 id="vaildsignature"><a class="header" href="#vaildsignature">vaildSignature</a></h3>
-<pre><code class="language-solidity">modifier vaildSignature(
-    address developer,
-    address employer,
-    uint256 startTime,
-    uint256 endTime,
-    bytes memory signature
-);
 </code></pre>
 <h3 id="initialize-1"><a class="header" href="#initialize-1">initialize</a></h3>
 <p>Initialize the contract, setting web3Entry address.</p>
@@ -497,7 +444,7 @@ it will try to collect the employment first, and then override the employment co
     uint256 startTime,
     uint256 endTime,
     bytes memory signature
-) external override vaildSignature(developer, msg.sender, startTime, endTime, signature);
+) external override;
 </code></pre>
 <p><strong>Parameters</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
@@ -538,15 +485,6 @@ Emits a {CancelEmployment} event.</p>
 </div>
 <h3 id="claimsalary-1"><a class="header" href="#claimsalary-1">claimSalary</a></h3>
 <pre><code class="language-solidity">function claimSalary(uint256 employmentConfigId) external override validEmploymentId(employmentConfigId) nonReentrant;
-</code></pre>
-<h3 id="_verifysignature"><a class="header" href="#_verifysignature">_verifySignature</a></h3>
-<pre><code class="language-solidity">function _verifySignature(
-    address developer,
-    address employer,
-    uint256 startTime,
-    uint256 endTime,
-    bytes memory signature
-) internal pure returns (bool);
 </code></pre>
 <h3 id="getfeefraction-1"><a class="header" href="#getfeefraction-1">getFeeFraction</a></h3>
 <p>Returns the fee percentage of specific &lt;receiver, employment&gt;.</p>
@@ -625,26 +563,6 @@ Emits a {CancelEmployment} event.</p>
 <tr><td><code>&lt;none&gt;</code></td><td><code>uint256</code></td><td>The available salary.</td></tr>
 </tbody></table>
 </div>
-<h3 id="verifysignature-2"><a class="header" href="#verifysignature-2">verifySignature</a></h3>
-<p>Returns the verify signature result.</p>
-<p><em>It will return the verify signature result.</em></p>
-<pre><code class="language-solidity">function verifySignature(
-    address developer,
-    address employer,
-    uint256 startTime,
-    uint256 endTime,
-    bytes memory signature
-) external pure override returns (bool);
-</code></pre>
-<p><strong>Parameters</strong></p>
-<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>developer</code></td><td><code>address</code></td><td>The signer address(developer).</td></tr>
-<tr><td><code>employer</code></td><td><code>address</code></td><td>The employer address.</td></tr>
-<tr><td><code>startTime</code></td><td><code>uint256</code></td><td>The start time of employment.</td></tr>
-<tr><td><code>endTime</code></td><td><code>uint256</code></td><td>The end time of employment.</td></tr>
-<tr><td><code>signature</code></td><td><code>bytes</code></td><td>The signature of the message.</td></tr>
-</tbody></table>
-</div>
 <h3 id="_getfeefraction"><a class="header" href="#_getfeefraction">_getFeeFraction</a></h3>
 <pre><code class="language-solidity">function _getFeeFraction(uint256 employmentConfigId, address feeReceiver) internal view returns (uint256);
 </code></pre>
@@ -697,16 +615,43 @@ Emits a {CancelEmployment} event.</p>
 <p><em>Emitted when a developer claim the salary.</em></p>
 <pre><code class="language-solidity">event CancelEmployment(uint256 indexed employmentConfigId, address token, uint256 refundedAmount);
 </code></pre>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="contents-3"><a class="header" href="#contents-3">Contents</a></h1>
+<h2 id="errors"><a class="header" href="#errors">Errors</a></h2>
+<h3 id="invalidsigner"><a class="header" href="#invalidsigner">InvalidSigner</a></h3>
+<pre><code class="language-solidity">error InvalidSigner();
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="verifier"><a class="header" href="#verifier">Verifier</a></h1>
+<p><a href="https://github.com/pseudoyu/openbuild-contracts/blob/6276b992f3d046c08932c21375cd358fb5a90647/contracts/skillshub/Verifier.sol">Git Source</a></p>
+<h2 id="state-variables-1"><a class="header" href="#state-variables-1">State Variables</a></h2>
+<h3 id="domainseparator"><a class="header" href="#domainseparator">domainSeparator</a></h3>
+<pre><code class="language-solidity">bytes32 public domainSeparator;
+</code></pre>
+<h3 id="employhash"><a class="header" href="#employhash">employHash</a></h3>
+<pre><code class="language-solidity">bytes32 public constant employHash =
+    keccak256(&quot;Employ(uint256 startTime, uint256 endTime, uint256 amount,address token)&quot;);
+</code></pre>
+<h2 id="functions-2"><a class="header" href="#functions-2">Functions</a></h2>
+<h3 id="constructor"><a class="header" href="#constructor">constructor</a></h3>
+<pre><code class="language-solidity">constructor();
+</code></pre>
+<h3 id="_recoveremploy"><a class="header" href="#_recoveremploy">_recoverEmploy</a></h3>
+<pre><code class="language-solidity">function _recoverEmploy(uint256 startTime, uint256 endTime, uint256 amount, address token, bytes memory signature)
+    internal
+    pure
+    returns (address signAddr);
+</code></pre>
+<h3 id="_recoververify"><a class="header" href="#_recoververify">_recoverVerify</a></h3>
+<pre><code class="language-solidity">function _recoverVerify(bytes32 structHash, uint8 v, bytes32 r, bytes32 s) internal pure returns (address signAddr);
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="contents-2"><a class="header" href="#contents-2">Contents</a></h1>
 <ul>
 <li><a href="contracts/token/OpenBuildToken.sol/contract.OpenBuildToken.html">OpenBuildToken</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="openbuildtoken"><a class="header" href="#openbuildtoken">OpenBuildToken</a></h1>
-<p><a href="https://github.com/pseudoyu/openbuild-contracts/blob/df8e29fd3f600291e954b5716e072b1a80aa1105/contracts/token/OpenBuildToken.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/openbuild-contracts/blob/6276b992f3d046c08932c21375cd358fb5a90647/contracts/token/OpenBuildToken.sol">Git Source</a></p>
 <p><strong>Inherits:</strong>
 ERC20</p>
 <h2 id="functions-3"><a class="header" href="#functions-3">Functions</a></h2>
-<h3 id="constructor"><a class="header" href="#constructor">constructor</a></h3>
+<h3 id="constructor-1"><a class="header" href="#constructor-1">constructor</a></h3>
 <pre><code class="language-solidity">constructor(address initialAccount) ERC20(&quot;OPENBUILD&quot;, &quot;OBT&quot;);
 </code></pre>
 
