@@ -5,6 +5,7 @@ pragma solidity 0.8.18;
 import {OpenBuildToken} from "../../contracts/mocks/OpenBuildToken.sol";
 import {SkillsHub} from "../../contracts/skillshub/SkillsHub.sol";
 import {Utils} from "./Utils.sol";
+import {SigUtils} from "../../contracts/signature/SigUtils.sol";
 
 contract CommonTest is Utils {
     OpenBuildToken public token;
@@ -32,9 +33,6 @@ contract CommonTest is Utils {
     }
 
     function _deployContracts() internal {
-        // deploy tips
-        skillsHub = new SkillsHub();
-
         // deploy token
         token = new OpenBuildToken();
     }

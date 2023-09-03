@@ -6,11 +6,16 @@ import {CommonTest} from "./helpers/CommonTest.sol";
 import {SkillsHub} from "../contracts/skillshub/SkillsHub.sol";
 import {OpenBuildToken} from "../contracts/mocks/OpenBuildToken.sol";
 import {ISkillsHub} from "../contracts/interfaces/ISkillsHub.sol";
+import {SigUtils} from "../contracts/signature/SigUtils.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "forge-std/console.sol";
 
 contract SkillsHubTest is CommonTest {
     uint256 public constant initialBalance = 100 ether;
+
+    bytes32 public DOMAIN_SEPARATOR;
+
+    SigUtils internal sigUtils;
 
     // events
     event SetEmploymentConfig(
@@ -62,6 +67,25 @@ contract SkillsHubTest is CommonTest {
 
     function setUp() public {
         _setUp();
+
+        // deploy skillsHub
+        skillsHub = new SkillsHub();
+
+        DOMAIN_SEPARATOR = keccak256(
+            abi.encode(
+                keccak256(
+                    "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
+                ),
+                // This should match the domain you set in your client side signing.
+                keccak256(bytes("Employment")),
+                keccak256(bytes("1")),
+                block.chainid,
+                address(this)
+            )
+        );
+
+        // setup sigUtils
+        sigUtils = new SigUtils(DOMAIN_SEPARATOR);
     }
 
     function testSetupState() public {
@@ -90,50 +114,44 @@ contract SkillsHubTest is CommonTest {
         assertEq(skillsHub.getFeeFraction(alice), 0);
     }
 
-    // function testSetEmploymentConfigSigFailed(uint256 amount) public {
-    //     uint256 startTime = block.timestamp;
-    //     uint256 endTime = startTime + 1 days;
+    function testSetEmploymentConfigSig(uint256 amount) public {
+        uint256 startTime = block.timestamp;
+        uint256 endTime = startTime + 1 days;
 
-    //     uint256 deadline = 123;
+        uint256 deadline = 123;
 
-    //     console.log("TOKEN ADDRESS");
-    //     console.logAddress(address(token));
+        console.log("TOKEN ADDRESS");
+        console.logAddress(address(token));
 
-    //     bytes memory signature = sign(amount, address(token), deadline);
+        console.log("TEST ADDRESS");
+        console.logAddress(address(this));
 
-    //     vm.assume(amount > 0);
+        vm.assume(amount > 0);
 
-    //     expectEmit(CheckAll);
-    //     emit SetEmploymentConfig(1, alice, bob, address(token), amount, startTime, endTime);
+        SigUtils.Employ memory employ = SigUtils.Employ({
+            amount: amount / (endTime - startTime),
+            token: address(token),
+            deadline: deadline
+        });
 
-    //     vm.prank(alice);
-    //     skillsHub.setEmploymentConfig(
-    //         bob,
-    //         address(token),
-    //         amount,
-    //         startTime,
-    //         endTime,
-    //         deadline,
-    //         signature
-    //     );
-    // }
-
-    // Signing function
-    function sign(uint256 amount, address token, uint256 deadline) public returns (bytes memory) {
-        bytes32 structHash = keccak256(abi.encode(employHash, amount, token, deadline));
-
-        bytes32 digest = ECDSA.toTypedDataHash(employHash, structHash);
+        bytes32 digest = sigUtils.getTypedDataHash(employ);
 
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(bobPrivateKey, digest);
 
-        bytes memory signature = new bytes(65);
+        bytes memory signature = abi.encodePacked(r, s, v);
 
-        assembly {
-            mstore(add(signature, 32), r)
-            mstore(add(signature, 64), s)
-            mstore8(add(signature, 96), v)
-        }
+        expectEmit(CheckAll);
+        emit SetEmploymentConfig(1, alice, bob, address(token), amount, startTime, endTime);
 
-        return signature;
+        vm.prank(alice);
+        skillsHub.setEmploymentConfig(
+            bob,
+            address(token),
+            amount,
+            startTime,
+            endTime,
+            deadline,
+            signature
+        );
     }
 }
