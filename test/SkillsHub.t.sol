@@ -80,7 +80,7 @@ contract SkillsHubTest is CommonTest {
                 keccak256(bytes("Employment")),
                 keccak256(bytes("1")),
                 block.chainid,
-                address(this)
+                address(skillsHub)
             )
         );
 
@@ -117,14 +117,7 @@ contract SkillsHubTest is CommonTest {
     function testSetEmploymentConfigSig(uint256 amount) public {
         uint256 startTime = block.timestamp;
         uint256 endTime = startTime + 1 days;
-
         uint256 deadline = 123;
-
-        console.log("TOKEN ADDRESS");
-        console.logAddress(address(token));
-
-        console.log("TEST ADDRESS");
-        console.logAddress(address(this));
 
         vm.assume(amount > 0);
 
@@ -140,9 +133,39 @@ contract SkillsHubTest is CommonTest {
 
         bytes memory signature = abi.encodePacked(r, s, v);
 
-        expectEmit(CheckAll);
-        emit SetEmploymentConfig(1, alice, bob, address(token), amount, startTime, endTime);
+        vm.expectRevert("ERC20: insufficient allowance");
+        vm.prank(alice);
+        skillsHub.setEmploymentConfig(
+            bob,
+            address(token),
+            amount,
+            startTime,
+            endTime,
+            deadline,
+            signature
+        );
+    }
 
+    function testSetEmploymentConfigSigFailed(uint256 amount) public {
+        uint256 startTime = block.timestamp;
+        uint256 endTime = startTime + 1 days;
+        uint256 deadline = 123;
+
+        vm.assume(amount > 0);
+
+        SigUtils.Employ memory employ = SigUtils.Employ({
+            amount: amount / (endTime - startTime),
+            token: address(token),
+            deadline: deadline
+        });
+
+        bytes32 digest = sigUtils.getTypedDataHash(employ);
+
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(alicePrivateKey, digest);
+
+        bytes memory signature = abi.encodePacked(r, s, v);
+
+        vm.expectRevert(abi.encodeWithSelector(SkillsHub__SignerInvalid.selector, address(alice)));
         vm.prank(alice);
         skillsHub.setEmploymentConfig(
             bob,

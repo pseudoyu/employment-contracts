@@ -2,6 +2,12 @@
 pragma solidity 0.8.18;
 
 contract SigUtils {
+    struct Employ {
+        uint256 amount;
+        address token;
+        uint256 deadline;
+    }
+
     bytes32 internal DOMAIN_SEPARATOR;
 
     bytes32 public constant EMPLOY_HASH =
@@ -11,14 +17,8 @@ contract SigUtils {
         DOMAIN_SEPARATOR = _DOMAIN_SEPARATOR;
     }
 
-    struct Employ {
-        uint256 amount;
-        address token;
-        uint256 deadline;
-    }
-
     // computes the hash of a employ
-    function getStructHash(Employ memory _employ) public view returns (bytes32) {
+    function getStructHash(Employ memory _employ) public pure returns (bytes32) {
         return keccak256(abi.encode(EMPLOY_HASH, _employ.amount, _employ.token, _employ.deadline));
     }
 

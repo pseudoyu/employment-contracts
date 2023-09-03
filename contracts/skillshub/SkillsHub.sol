@@ -8,10 +8,7 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-
 import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
-
-import "forge-std/console.sol";
 
 /**
  * @title SkillsHub
@@ -156,12 +153,6 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
     ) external override {
         if (endTime <= startTime) revert SkillsHub__EmploymentTimeInvalid(startTime, endTime);
 
-        console.log("DEVELOPER");
-        console.logAddress(developer);
-
-        console.log("EMPLOYER");
-        console.logAddress(msg.sender);
-
         if (amount <= 0) revert SkillsHub__ConfigAmountInvalid(amount);
 
         uint256 employmentConfigId = ++_employmentConfigIndex;
@@ -179,13 +170,7 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
             lastClaimedTime: 0
         });
 
-        console.log("SIG");
-        console.logBytes(signature);
-
         address signer = _recoverEmploy(amount / (endTime - startTime), token, deadline, signature);
-
-        console.log("SIGNER");
-        console.logAddress(signer);
 
         if (signer != developer) revert SkillsHub__SignerInvalid(signer);
 
