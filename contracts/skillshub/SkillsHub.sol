@@ -24,7 +24,18 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.
 contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    error InvalidSigner();
+    // custom errors
+    error SkillsHub__SignerInvalid(address signer);
+    error SkillsHub__EmploymentConfigIdInvalid(uint256 employmentConfigId);
+    error SkillsHub__EmploymentTimeInvalid(uint256 startTime, uint256 endTime);
+    error SkillsHub__RenewalTimeInvalid(uint256 endTime, uint256 renewalTime);
+    error SkillsHub__ConfigAmountInvalid(uint256 amount);
+    error SkillsHub__FractionOutOfRange(uint256 fraction);
+    error SkillsHub__RenewalEmployerInconsistent(address employer);
+    error SkillsHub__RenewalEmploymentAlreadyEnded(uint256 endTime, uint256 renewalTime);
+    error SkillsHub__CancelEmployerInconsistent(address employer);
+    error SkillsHub__ClaimSallaryDeveloperInconsistent(address developer);
+    error SkillsHub__EmploymentNotStarted(uint256 startTime, uint256 claimTime);
 
     // slither-disable-start naming-convention
     // address of web3Entry contract
@@ -56,6 +67,17 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
         uint256 endTime
     );
 
+    /**
+     * @dev Emitted when a employer renewal the employment config.
+     * @param employmentConfigId The employment signature.
+     * @param employerAddress The employer address.```
+     * @param developerAddress The developer address.
+     * @param token The token address.
+     * @param amount The amount of token.
+     * @param additonalAmount The additonal amount of token.
+     * @param startTime The start time of employment.
+     * @param endTime The end time of employment.
+     */
     event RenewalEmploymentConfig(
         uint256 indexed employmentConfigId,
         address indexed employerAddress,
@@ -93,18 +115,15 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
         uint256 refundedAmount
     );
 
-    modifier onlyFeeReceiver(address feeReceiver) {
-        require(feeReceiver == msg.sender, "EmployWithConfig: caller is not fee receiver");
-        _;
-    }
-
     modifier validateFraction(uint256 fraction) {
-        require(fraction <= _feeDenominator(), "EmployWithConfig: fraction out of range");
+        if (fraction > _feeDenominator()) revert SkillsHub__FractionOutOfRange(fraction);
+
         _;
     }
 
     modifier validEmploymentId(uint256 employmentConfigId) {
-        require(employmentConfigId > 0, "EmployWithConfig: employmentConfigId is empty");
+        if (employmentConfigId <= 0)
+            revert SkillsHub__EmploymentConfigIdInvalid(employmentConfigId);
         _;
     }
 
@@ -117,7 +136,7 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
     function setFeeFraction(
         address feeReceiver,
         uint256 fraction
-    ) external override onlyFeeReceiver(feeReceiver) validateFraction(fraction) {
+    ) external override validateFraction(fraction) {
         _feeFractions[feeReceiver] = fraction;
     }
 
@@ -131,8 +150,9 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
         uint256 deadline,
         bytes memory signature
     ) external override {
-        require(endTime > startTime, "EmployWithConfig: end time must be greater than start time");
-        require(amount > 0, "EmployWithConfig: amount must be greater than zero");
+        if (endTime <= startTime) revert SkillsHub__EmploymentTimeInvalid(startTime, endTime);
+
+        if (amount <= 0) revert SkillsHub__ConfigAmountInvalid(amount);
 
         uint256 employmentConfigId = ++_employmentConfigIndex;
 
@@ -152,7 +172,7 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
         address signer = _recoverEmploy(amount / (endTime - startTime), token, deadline, signature);
 
         if ((signer != msg.sender && signer != developer) || signer == msg.sender)
-            revert InvalidSigner();
+            revert SkillsHub__SignerInvalid(signer);
 
         IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
 
@@ -176,13 +196,14 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
         bytes memory signature
     ) external override validEmploymentId(employmentConfigId) {
         EmploymentConfig storage config = _employmentConfigs[employmentConfigId];
-        require(msg.sender == config.employer, "EmployWithConfig: not employer");
-        require(block.timestamp < config.endTime, "EmployWithConfig: project already ended");
-        require(
-            endTime > config.startTime,
-            "EmployWithConfig: end time must be greater than start time"
-        );
-        require(endTime > config.endTime, "EmployWithConfig: end time must be greater than before");
+        if (msg.sender != config.employer)
+            revert SkillsHub__RenewalEmployerInconsistent(msg.sender);
+
+        if (endTime <= config.endTime)
+            revert SkillsHub__RenewalTimeInvalid(config.endTime, block.timestamp);
+
+        if (block.timestamp >= config.endTime)
+            revert SkillsHub__RenewalEmploymentAlreadyEnded(config.endTime, block.timestamp);
 
         config.endTime = endTime;
 
@@ -199,7 +220,7 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
         );
 
         if ((signer != msg.sender && signer != config.developer) || signer == msg.sender)
-            revert InvalidSigner();
+            revert SkillsHub__SignerInvalid(signer);
 
         IERC20(config.token).safeTransferFrom(config.employer, address(this), additonalAmount);
 
@@ -221,7 +242,7 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
         uint256 employmentConfigId
     ) external override validEmploymentId(employmentConfigId) {
         EmploymentConfig storage config = _employmentConfigs[employmentConfigId];
-        require(msg.sender == config.employer, "EmployWithConfig: not employer");
+        if (msg.sender != config.employer) revert SkillsHub__CancelEmployerInconsistent(msg.sender);
 
         // calculate the remaining funds
         if (config.amount > config.claimedAmount) {
@@ -243,8 +264,11 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
         uint256 employmentConfigId
     ) external override validEmploymentId(employmentConfigId) nonReentrant {
         EmploymentConfig storage config = _employmentConfigs[employmentConfigId];
-        require(msg.sender == config.developer, "EmployWithConfig: not developer");
-        require(block.timestamp >= config.startTime, "EmployWithConfig: project not started");
+        if (msg.sender != config.developer)
+            revert SkillsHub__ClaimSallaryDeveloperInconsistent(msg.sender);
+
+        if (block.timestamp < config.startTime)
+            revert SkillsHub__EmploymentNotStarted(config.startTime, block.timestamp);
 
         // calculate available funds
         uint256 claimAmount = _getAvailableSalary(
