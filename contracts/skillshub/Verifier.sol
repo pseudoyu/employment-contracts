@@ -2,13 +2,14 @@
 pragma solidity 0.8.18;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
 
-abstract contract Verifier {
+abstract contract Verifier is EIP712 {
     bytes32 public domainSeparator;
     bytes32 public constant employHash =
         keccak256("Employ(uint256 amount,address token,uint256 deadline)");
 
-    constructor() {
+    constructor() EIP712("Employment", "1") {
         domainSeparator = keccak256(
             abi.encode(
                 keccak256(

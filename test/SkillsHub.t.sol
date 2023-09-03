@@ -6,6 +6,8 @@ import {CommonTest} from "./helpers/CommonTest.sol";
 import {SkillsHub} from "../contracts/skillshub/SkillsHub.sol";
 import {OpenBuildToken} from "../contracts/mocks/OpenBuildToken.sol";
 import {ISkillsHub} from "../contracts/interfaces/ISkillsHub.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "forge-std/console.sol";
 
 contract SkillsHubTest is CommonTest {
     uint256 public constant initialBalance = 100 ether;
@@ -86,5 +88,52 @@ contract SkillsHubTest is CommonTest {
         skillsHub.setFeeFraction(alice, fraction);
 
         assertEq(skillsHub.getFeeFraction(alice), 0);
+    }
+
+    // function testSetEmploymentConfigSigFailed(uint256 amount) public {
+    //     uint256 startTime = block.timestamp;
+    //     uint256 endTime = startTime + 1 days;
+
+    //     uint256 deadline = 123;
+
+    //     console.log("TOKEN ADDRESS");
+    //     console.logAddress(address(token));
+
+    //     bytes memory signature = sign(amount, address(token), deadline);
+
+    //     vm.assume(amount > 0);
+
+    //     expectEmit(CheckAll);
+    //     emit SetEmploymentConfig(1, alice, bob, address(token), amount, startTime, endTime);
+
+    //     vm.prank(alice);
+    //     skillsHub.setEmploymentConfig(
+    //         bob,
+    //         address(token),
+    //         amount,
+    //         startTime,
+    //         endTime,
+    //         deadline,
+    //         signature
+    //     );
+    // }
+
+    // Signing function
+    function sign(uint256 amount, address token, uint256 deadline) public returns (bytes memory) {
+        bytes32 structHash = keccak256(abi.encode(employHash, amount, token, deadline));
+
+        bytes32 digest = ECDSA.toTypedDataHash(employHash, structHash);
+
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(bobPrivateKey, digest);
+
+        bytes memory signature = new bytes(65);
+
+        assembly {
+            mstore(add(signature, 32), r)
+            mstore(add(signature, 64), s)
+            mstore8(add(signature, 96), v)
+        }
+
+        return signature;
     }
 }
