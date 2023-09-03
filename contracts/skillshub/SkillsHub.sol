@@ -10,6 +10,8 @@ import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.s
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
 
+// import "forge-std/console.sol";
+
 /**
  * @title SkillsHub
  * @notice Logic to handle the employemnt that the employer can set the employment config for a cooperation.,
@@ -99,8 +101,8 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
      */
     event ClaimSalary(
         uint256 indexed employmentConfigId,
-        address token,
-        uint256 claimAmount,
+        address indexed token,
+        uint256 indexed claimAmount,
         uint256 lastClaimedTime
     );
 
@@ -112,8 +114,8 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
      */
     event CancelEmployment(
         uint256 indexed employmentConfigId,
-        address token,
-        uint256 refundedAmount
+        address indexed token,
+        uint256 indexed refundedAmount
     );
 
     modifier validateFraction(uint256 fraction) {
@@ -205,11 +207,11 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
         if (block.timestamp >= config.endTime)
             revert SkillsHub__RenewalEmploymentAlreadyEnded(config.endTime, block.timestamp);
 
-        config.endTime = endTime;
-
+        // uint256 additonalAmount = (amount * (renewalTime - endTime)) / (endTime - startTime);
         uint256 additonalAmount = (config.amount * (endTime - config.endTime)) /
             (config.endTime - config.startTime);
 
+        config.endTime = endTime;
         config.amount += additonalAmount;
 
         address signer = _recoverEmploy(
@@ -219,8 +221,7 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
             signature
         );
 
-        if ((signer != msg.sender && signer != config.developer) || signer == msg.sender)
-            revert SkillsHub__SignerInvalid(signer);
+        if (signer != config.developer) revert SkillsHub__SignerInvalid(signer);
 
         IERC20(config.token).safeTransferFrom(config.employer, address(this), additonalAmount);
 
@@ -244,19 +245,23 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
         EmploymentConfig storage config = _employmentConfigs[employmentConfigId];
         if (msg.sender != config.employer) revert SkillsHub__CancelEmployerInconsistent(msg.sender);
 
-        // calculate the remaining funds
-        if (config.amount > config.claimedAmount) {
-            IERC20(config.token).safeTransfer(
-                config.employer,
-                config.amount - config.claimedAmount
-            );
+        // calculate the available funds
+        uint256 availableFund = _getAvailableSalary(
+            config.amount,
+            block.timestamp,
+            config.startTime,
+            config.endTime
+        );
+
+        if (config.amount > availableFund) {
+            IERC20(config.token).safeTransfer(config.employer, config.amount - availableFund);
         }
+
+        // emit event
+        emit CancelEmployment(config.id, config.token, config.amount - availableFund);
 
         // delete employment config
         delete _employmentConfigs[config.id];
-
-        // emit event
-        emit CancelEmployment(config.id, config.token, config.amount - config.claimedAmount);
     }
 
     // @inheritdoc ISkillsHub
@@ -289,6 +294,7 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
         }
 
         config.claimedAmount += claimAmount;
+
         config.lastClaimedTime = block.timestamp;
 
         // emit event

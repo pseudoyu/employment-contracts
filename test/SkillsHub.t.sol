@@ -8,7 +8,8 @@ import {OpenBuildToken} from "../contracts/mocks/OpenBuildToken.sol";
 import {ISkillsHub} from "../contracts/interfaces/ISkillsHub.sol";
 import {SigUtils} from "../contracts/signature/SigUtils.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "forge-std/console.sol";
+
+// import "forge-std/console.sol";
 
 contract SkillsHubTest is CommonTest {
     uint256 public constant initialBalance = 100 ether;
@@ -41,16 +42,28 @@ contract SkillsHubTest is CommonTest {
 
     event ClaimSalary(
         uint256 indexed employmentConfigId,
-        address token,
-        uint256 claimAmount,
+        address indexed token,
+        uint256 indexed claimAmount,
         uint256 lastClaimedTime
     );
 
     event CancelEmployment(
         uint256 indexed employmentConfigId,
-        address token,
-        uint256 refundedAmount
+        address indexed token,
+        uint256 indexed refundedAmount
     );
+
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+
+    event Sent(
+        address indexed operator,
+        address indexed from,
+        address indexed to,
+        uint256 amount,
+        bytes data,
+        bytes operatorData
+    );
+    event Transfer(address indexed from, address indexed to, uint256 value);
 
     // custom errors
     error SkillsHub__SignerInvalid(address signer);
@@ -114,23 +127,82 @@ contract SkillsHubTest is CommonTest {
         assertEq(skillsHub.getFeeFraction(alice), 0);
     }
 
-    function testSetEmploymentConfigSig(uint256 amount) public {
+    function testSetEmploymentConfig(uint256 amount) public {
         uint256 startTime = block.timestamp;
         uint256 endTime = startTime + 1 days;
         uint256 deadline = 123;
 
-        vm.assume(amount > 0);
+        // get random employment amount
+        vm.assume(amount > 0 && amount <= 10);
 
+        // transfer token
+        token.transfer(address(alice), amount);
+
+        // approve token
+        vm.prank(alice);
+        token.approve(address(skillsHub), amount);
+
+        // construct signature(signer: developer(bob))
         SigUtils.Employ memory employ = SigUtils.Employ({
             amount: amount / (endTime - startTime),
             token: address(token),
             deadline: deadline
         });
-
         bytes32 digest = sigUtils.getTypedDataHash(employ);
-
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(bobPrivateKey, digest);
+        bytes memory signature = abi.encodePacked(r, s, v);
 
+        expectEmit(CheckAll);
+        emit Approval(address(alice), address(skillsHub), 0);
+
+        expectEmit(CheckAll);
+        emit Transfer(address(alice), address(skillsHub), amount);
+
+        expectEmit(CheckAll);
+        emit SetEmploymentConfig(
+            1,
+            address(alice),
+            address(bob),
+            address(token),
+            amount,
+            startTime,
+            endTime
+        );
+
+        vm.prank(alice);
+        skillsHub.setEmploymentConfig(
+            bob,
+            address(token),
+            amount,
+            startTime,
+            endTime,
+            deadline,
+            signature
+        );
+
+        assertEq(token.balanceOf(alice), 0);
+        assertEq(token.balanceOf(address(skillsHub)), amount);
+    }
+
+    function testSetEmploymentConfigInsufficientAllowance(uint256 amount) public {
+        uint256 startTime = block.timestamp;
+        uint256 endTime = startTime + 1 days;
+        uint256 deadline = 123;
+
+        // get random employment amount
+        vm.assume(amount > 0 && amount <= 10);
+
+        // transfer token
+        token.transfer(address(alice), amount);
+
+        // construct signature(signer: developer(bob))
+        SigUtils.Employ memory employ = SigUtils.Employ({
+            amount: amount / (endTime - startTime),
+            token: address(token),
+            deadline: deadline
+        });
+        bytes32 digest = sigUtils.getTypedDataHash(employ);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(bobPrivateKey, digest);
         bytes memory signature = abi.encodePacked(r, s, v);
 
         vm.expectRevert("ERC20: insufficient allowance");
@@ -144,6 +216,50 @@ contract SkillsHubTest is CommonTest {
             deadline,
             signature
         );
+
+        assertEq(token.balanceOf(alice), amount);
+        assertEq(token.balanceOf(address(skillsHub)), 0);
+    }
+
+    function testSetEmploymentConfigInsufficientBalance(uint256 amount) public {
+        uint256 startTime = block.timestamp;
+        uint256 endTime = startTime + 1 days;
+        uint256 deadline = 123;
+
+        // get random employment amount
+        vm.assume(amount > 2 && amount <= 10);
+
+        // transfer token
+        token.transfer(address(alice), amount - 1);
+
+        // approve token
+        vm.prank(alice);
+        token.approve(address(skillsHub), amount);
+
+        // construct signature(signer: developer(bob))
+        SigUtils.Employ memory employ = SigUtils.Employ({
+            amount: amount / (endTime - startTime),
+            token: address(token),
+            deadline: deadline
+        });
+        bytes32 digest = sigUtils.getTypedDataHash(employ);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(bobPrivateKey, digest);
+        bytes memory signature = abi.encodePacked(r, s, v);
+
+        vm.expectRevert("ERC20: transfer amount exceeds balance");
+        vm.prank(alice);
+        skillsHub.setEmploymentConfig(
+            bob,
+            address(token),
+            amount,
+            startTime,
+            endTime,
+            deadline,
+            signature
+        );
+
+        assertEq(token.balanceOf(alice), amount - 1);
+        assertEq(token.balanceOf(address(skillsHub)), 0);
     }
 
     function testSetEmploymentConfigSigFailed(uint256 amount) public {
@@ -176,5 +292,214 @@ contract SkillsHubTest is CommonTest {
             deadline,
             signature
         );
+    }
+
+    function testRenewalEmploymentConfig(uint256 renewalTime) public {
+        // set config
+
+        uint256 startTime = block.timestamp;
+        uint256 endTime = startTime + 3 days;
+        renewalTime = endTime + 1 days;
+        uint256 deadline = 123;
+
+        uint256 amount = 456789;
+
+        // transfer token
+        token.transfer(address(alice), amount);
+
+        // approve token
+        vm.prank(alice);
+        token.approve(address(skillsHub), amount);
+
+        // construct signature(signer: developer(bob))
+        SigUtils.Employ memory employ = SigUtils.Employ({
+            amount: amount / (endTime - startTime),
+            token: address(token),
+            deadline: deadline
+        });
+        bytes32 digest = sigUtils.getTypedDataHash(employ);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(bobPrivateKey, digest);
+        bytes memory signature = abi.encodePacked(r, s, v);
+
+        vm.prank(alice);
+        skillsHub.setEmploymentConfig(
+            bob,
+            address(token),
+            amount,
+            startTime,
+            endTime,
+            deadline,
+            signature
+        );
+
+        // renewal config
+
+        uint256 additonalAmount = (amount * (renewalTime - endTime)) / (endTime - startTime);
+
+        // transfer token
+        token.transfer(address(alice), additonalAmount);
+
+        // approve token
+        vm.prank(alice);
+        token.approve(address(skillsHub), amount + additonalAmount);
+
+        // construct signature(signer: developer(bob))
+        employ = SigUtils.Employ({
+            amount: (amount + additonalAmount) / (renewalTime - startTime),
+            token: address(token),
+            deadline: deadline
+        });
+
+        digest = sigUtils.getTypedDataHash(employ);
+        (v, r, s) = vm.sign(bobPrivateKey, digest);
+        signature = abi.encodePacked(r, s, v);
+
+        expectEmit(CheckAll);
+        emit Approval(address(alice), address(skillsHub), amount);
+        expectEmit(CheckAll);
+        emit Transfer(address(alice), address(skillsHub), additonalAmount);
+        expectEmit(CheckAll);
+        emit RenewalEmploymentConfig(
+            1,
+            address(alice),
+            address(bob),
+            address(token),
+            amount + additonalAmount,
+            additonalAmount,
+            startTime,
+            renewalTime
+        );
+        vm.prank(alice);
+        skillsHub.renewalEmploymentConfig(1, renewalTime, deadline, signature);
+
+        assertEq(token.balanceOf(address(skillsHub)), amount + additonalAmount);
+        assertEq(token.balanceOf(alice), 0);
+    }
+
+    function testCancelEmployment() public {
+        // set config
+        uint256 startTime = block.timestamp;
+        uint256 endTime = startTime + 1 days;
+        uint256 deadline = 123;
+
+        uint256 amount = 456789;
+
+        // transfer token
+        token.transfer(address(alice), amount);
+
+        // approve token
+        vm.prank(alice);
+        token.approve(address(skillsHub), amount);
+
+        // construct signature(signer: developer(bob))
+        SigUtils.Employ memory employ = SigUtils.Employ({
+            amount: amount / (endTime - startTime),
+            token: address(token),
+            deadline: deadline
+        });
+        bytes32 digest = sigUtils.getTypedDataHash(employ);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(bobPrivateKey, digest);
+        bytes memory signature = abi.encodePacked(r, s, v);
+
+        vm.prank(alice);
+        skillsHub.setEmploymentConfig(
+            bob,
+            address(token),
+            amount,
+            startTime,
+            endTime,
+            deadline,
+            signature
+        );
+
+        skip(7 hours);
+
+        uint256 availableFund = _getAvailableSalary(amount, block.timestamp, startTime, endTime);
+
+        // cancel config
+        vm.expectEmit(true, true, false, false);
+        emit CancelEmployment(1, address(token), amount - availableFund);
+        vm.prank(alice);
+        skillsHub.cancelEmployment(1);
+    }
+
+    function testClaimSalary() public {
+        // set config
+        uint256 startTime = block.timestamp;
+        uint256 endTime = startTime + 1 days;
+        uint256 deadline = 123;
+
+        // get random employment amount
+        uint256 amount = 456789;
+
+        // transfer token
+        token.transfer(address(alice), amount);
+
+        // approve token
+        vm.prank(alice);
+        token.approve(address(skillsHub), amount);
+
+        // construct signature(signer: developer(bob))
+        SigUtils.Employ memory employ = SigUtils.Employ({
+            amount: amount / (endTime - startTime),
+            token: address(token),
+            deadline: deadline
+        });
+        bytes32 digest = sigUtils.getTypedDataHash(employ);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(bobPrivateKey, digest);
+        bytes memory signature = abi.encodePacked(r, s, v);
+
+        vm.prank(alice);
+        skillsHub.setEmploymentConfig(
+            bob,
+            address(token),
+            amount,
+            startTime,
+            endTime,
+            deadline,
+            signature
+        );
+
+        // skip some time
+        skip(7 hours);
+
+        // claim salary
+        vm.expectEmit(true, true, false, false);
+        emit ClaimSalary(
+            1,
+            address(token),
+            _getAvailableSalary(amount, block.timestamp, startTime, endTime),
+            block.timestamp
+        );
+        vm.prank(bob);
+        skillsHub.claimSalary(1);
+
+        // claim salalry again
+        skip(3 hours);
+        // claim salary
+        vm.expectEmit(true, true, false, false);
+        emit ClaimSalary(
+            1,
+            address(token),
+            _getAvailableSalary(amount, block.timestamp, startTime, endTime),
+            block.timestamp
+        );
+        vm.prank(bob);
+        skillsHub.claimSalary(1);
+    }
+
+    function _getAvailableSalary(
+        uint256 amount,
+        uint256 currentTime,
+        uint256 startTime,
+        uint256 endTime
+    ) internal pure returns (uint256) {
+        if (currentTime >= endTime) {
+            return amount;
+        } else if (currentTime <= startTime) {
+            return 0;
+        } else {
+            return (amount * (currentTime - startTime)) / (endTime - startTime);
+        }
     }
 }
