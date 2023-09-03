@@ -171,7 +171,7 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="skillshub"><a class="header" href="#skillshub">SkillsHub</a></h1>
-<p><a href="https://github.com/pseudoyu/openbuild-contracts/blob/5e27d23a53ceba9f4683064b216dbd0d773c6eb0/contracts/skillshub/SkillsHub.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/openbuild-contracts/blob/866492a04bbb9161940a149a942cfbd463a28f04/contracts/skillshub/SkillsHub.sol">Git Source</a></p>
 <p><strong>Inherits:</strong>
 <a href="/contracts/skillshub/Verifier.sol/abstract.Verifier.html">Verifier</a>, <a href="/contracts/interfaces/ISkillsHub.sol/interface.ISkillsHub.html">ISkillsHub</a>, Initializable, ReentrancyGuard</p>
 <p>Logic to handle the employemnt that the employer can set the employment config for a cooperation.,</p>
@@ -195,9 +195,6 @@ from the contract account to the <code>developer</code> account.</em></p>
 <pre><code class="language-solidity">mapping(address feeReceiver =&gt; uint256 fraction) internal _feeFractions;
 </code></pre>
 <h2 id="functions"><a class="header" href="#functions">Functions</a></h2>
-<h3 id="onlyfeereceiver"><a class="header" href="#onlyfeereceiver">onlyFeeReceiver</a></h3>
-<pre><code class="language-solidity">modifier onlyFeeReceiver(address feeReceiver);
-</code></pre>
 <h3 id="validatefraction"><a class="header" href="#validatefraction">validateFraction</a></h3>
 <pre><code class="language-solidity">modifier validateFraction(uint256 fraction);
 </code></pre>
@@ -215,11 +212,7 @@ from the contract account to the <code>developer</code> account.</em></p>
 </div>
 <h3 id="setfeefraction"><a class="header" href="#setfeefraction">setFeeFraction</a></h3>
 <p>Sets the fee percentage of specific receiver.</p>
-<pre><code class="language-solidity">function setFeeFraction(address feeReceiver, uint256 fraction)
-    external
-    override
-    onlyFeeReceiver(feeReceiver)
-    validateFraction(fraction);
+<pre><code class="language-solidity">function setFeeFraction(address feeReceiver, uint256 fraction) external override validateFraction(fraction);
 </code></pre>
 <p><strong>Parameters</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
@@ -379,6 +372,7 @@ Emits a {CancelEmployment} event.</p>
 );
 </code></pre>
 <h3 id="renewalemploymentconfig-1"><a class="header" href="#renewalemploymentconfig-1">RenewalEmploymentConfig</a></h3>
+<p><em>Emitted when a employer renewal the employment config.</em></p>
 <pre><code class="language-solidity">event RenewalEmploymentConfig(
     uint256 indexed employmentConfigId,
     address indexed employerAddress,
@@ -399,8 +393,38 @@ Emits a {CancelEmployment} event.</p>
 <pre><code class="language-solidity">event CancelEmployment(uint256 indexed employmentConfigId, address token, uint256 refundedAmount);
 </code></pre>
 <h2 id="errors"><a class="header" href="#errors">Errors</a></h2>
-<h3 id="invalidsigner"><a class="header" href="#invalidsigner">InvalidSigner</a></h3>
-<pre><code class="language-solidity">error InvalidSigner();
+<h3 id="skillshub__signerinvalid"><a class="header" href="#skillshub__signerinvalid">SkillsHub__SignerInvalid</a></h3>
+<pre><code class="language-solidity">error SkillsHub__SignerInvalid(address signer);
+</code></pre>
+<h3 id="skillshub__employmentconfigidinvalid"><a class="header" href="#skillshub__employmentconfigidinvalid">SkillsHub__EmploymentConfigIdInvalid</a></h3>
+<pre><code class="language-solidity">error SkillsHub__EmploymentConfigIdInvalid(uint256 employmentConfigId);
+</code></pre>
+<h3 id="skillshub__employmenttimeinvalid"><a class="header" href="#skillshub__employmenttimeinvalid">SkillsHub__EmploymentTimeInvalid</a></h3>
+<pre><code class="language-solidity">error SkillsHub__EmploymentTimeInvalid(uint256 startTime, uint256 endTime);
+</code></pre>
+<h3 id="skillshub__renewaltimeinvalid"><a class="header" href="#skillshub__renewaltimeinvalid">SkillsHub__RenewalTimeInvalid</a></h3>
+<pre><code class="language-solidity">error SkillsHub__RenewalTimeInvalid(uint256 endTime, uint256 renewalTime);
+</code></pre>
+<h3 id="skillshub__configamountinvalid"><a class="header" href="#skillshub__configamountinvalid">SkillsHub__ConfigAmountInvalid</a></h3>
+<pre><code class="language-solidity">error SkillsHub__ConfigAmountInvalid(uint256 amount);
+</code></pre>
+<h3 id="skillshub__fractionoutofrange"><a class="header" href="#skillshub__fractionoutofrange">SkillsHub__FractionOutOfRange</a></h3>
+<pre><code class="language-solidity">error SkillsHub__FractionOutOfRange(uint256 fraction);
+</code></pre>
+<h3 id="skillshub__renewalemployerinconsistent"><a class="header" href="#skillshub__renewalemployerinconsistent">SkillsHub__RenewalEmployerInconsistent</a></h3>
+<pre><code class="language-solidity">error SkillsHub__RenewalEmployerInconsistent(address employer);
+</code></pre>
+<h3 id="skillshub__renewalemploymentalreadyended"><a class="header" href="#skillshub__renewalemploymentalreadyended">SkillsHub__RenewalEmploymentAlreadyEnded</a></h3>
+<pre><code class="language-solidity">error SkillsHub__RenewalEmploymentAlreadyEnded(uint256 endTime, uint256 renewalTime);
+</code></pre>
+<h3 id="skillshub__cancelemployerinconsistent"><a class="header" href="#skillshub__cancelemployerinconsistent">SkillsHub__CancelEmployerInconsistent</a></h3>
+<pre><code class="language-solidity">error SkillsHub__CancelEmployerInconsistent(address employer);
+</code></pre>
+<h3 id="skillshub__claimsallarydeveloperinconsistent"><a class="header" href="#skillshub__claimsallarydeveloperinconsistent">SkillsHub__ClaimSallaryDeveloperInconsistent</a></h3>
+<pre><code class="language-solidity">error SkillsHub__ClaimSallaryDeveloperInconsistent(address developer);
+</code></pre>
+<h3 id="skillshub__employmentnotstarted"><a class="header" href="#skillshub__employmentnotstarted">SkillsHub__EmploymentNotStarted</a></h3>
+<pre><code class="language-solidity">error SkillsHub__EmploymentNotStarted(uint256 startTime, uint256 claimTime);
 </code></pre>
 
                     </main>
