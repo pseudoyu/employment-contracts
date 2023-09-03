@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 abstract contract Verifier {
     bytes32 public domainSeparator;
     bytes32 public constant employHash =
-        keccak256("Employ(uint256 startTime, uint256 endTime, uint256 amount,address token)");
+        keccak256("Employ(uint256 amount,address token,uint256 deadline)");
 
     constructor() {
         domainSeparator = keccak256(
@@ -24,10 +24,9 @@ abstract contract Verifier {
     }
 
     function _recoverEmploy(
-        uint256 startTime,
-        uint256 endTime,
         uint256 amount,
         address token,
+        uint256 deadline,
         bytes memory signature
     ) internal pure returns (address signAddr) {
         bytes32 r;
@@ -38,7 +37,7 @@ abstract contract Verifier {
             s := mload(add(signature, 0x40))
             v := byte(0, mload(add(signature, 0x60)))
         }
-        bytes32 structHash = keccak256(abi.encode(employHash, startTime, endTime, amount, token));
+        bytes32 structHash = keccak256(abi.encode(employHash, amount, token, deadline));
         return _recoverVerify(structHash, v, r, s);
     }
 

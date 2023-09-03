@@ -33,8 +33,6 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
     uint256 internal _employmentConfigIndex;
     mapping(uint256 employmentConfigId => EmploymentConfig) internal _employmentConfigs;
     mapping(address feeReceiver => uint256 fraction) internal _feeFractions;
-    mapping(address feeReceiver => mapping(uint256 employmentConfigId => uint256 fraction))
-        internal _feeFractions4Employment;
     // slither-disable-end naming-convention
 
     // events
@@ -116,20 +114,11 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
     }
 
     /// @inheritdoc ISkillsHub
-    function setDefaultFeeFraction(
+    function setFeeFraction(
         address feeReceiver,
         uint256 fraction
     ) external override onlyFeeReceiver(feeReceiver) validateFraction(fraction) {
         _feeFractions[feeReceiver] = fraction;
-    }
-
-    /// @inheritdoc ISkillsHub
-    function setFeeFraction(
-        uint256 employmentConfigId,
-        address feeReceiver,
-        uint256 fraction
-    ) external override onlyFeeReceiver(feeReceiver) validateFraction(fraction) {
-        _feeFractions4Employment[feeReceiver][employmentConfigId] = fraction;
     }
 
     /// @inheritdoc ISkillsHub
@@ -139,6 +128,7 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
         uint256 amount,
         uint256 startTime,
         uint256 endTime,
+        uint256 deadline,
         bytes memory signature
     ) external override {
         require(endTime > startTime, "EmployWithConfig: end time must be greater than start time");
@@ -159,7 +149,7 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
             lastClaimedTime: 0
         });
 
-        address signer = _recoverEmploy(startTime, endTime, amount, token, signature);
+        address signer = _recoverEmploy(amount / (endTime - startTime), token, deadline, signature);
 
         if ((signer != msg.sender && signer != developer) || signer == msg.sender)
             revert InvalidSigner();
@@ -182,6 +172,7 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
     function renewalEmploymentConfig(
         uint256 employmentConfigId,
         uint256 endTime,
+        uint256 deadline,
         bytes memory signature
     ) external override validEmploymentId(employmentConfigId) {
         EmploymentConfig storage config = _employmentConfigs[employmentConfigId];
@@ -201,10 +192,9 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
         config.amount += additonalAmount;
 
         address signer = _recoverEmploy(
-            config.startTime,
-            endTime,
-            config.amount,
+            config.amount / (config.endTime - config.startTime),
             config.token,
+            deadline,
             signature
         );
 
@@ -266,7 +256,7 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
 
         // claim avaliable funds
         if (claimAmount > 0) {
-            uint256 fee = _getFeeAmount(employmentConfigId, _feeReceiver, claimAmount);
+            uint256 fee = _getFeeAmount(_feeReceiver, claimAmount);
             IERC20(config.token).safeTransfer(config.developer, claimAmount - fee);
 
             if (fee > 0) {
@@ -282,20 +272,16 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
     }
 
     /// @inheritdoc ISkillsHub
-    function getFeeFraction(
-        uint256 employmentConfigId,
-        address feeReceiver
-    ) external view override validEmploymentId(employmentConfigId) returns (uint256) {
-        return _getFeeFraction(employmentConfigId, feeReceiver);
+    function getFeeFraction(address feeReceiver) external view override returns (uint256) {
+        return _getFeeFraction(feeReceiver);
     }
 
     /// @inheritdoc ISkillsHub
     function getFeeAmount(
-        uint256 employmentConfigId,
         address feeReceiver,
         uint256 amount
-    ) external view override validEmploymentId(employmentConfigId) returns (uint256) {
-        return _getFeeAmount(employmentConfigId, feeReceiver, amount);
+    ) external view override returns (uint256) {
+        return _getFeeAmount(feeReceiver, amount);
     }
 
     /// @inheritdoc ISkillsHub
@@ -322,23 +308,13 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
             config.claimedAmount;
     }
 
-    function _getFeeFraction(
-        uint256 employmentConfigId,
-        address feeReceiver
-    ) internal view returns (uint256) {
-        // get character fraction
-        uint256 fraction = _feeFractions4Employment[feeReceiver][employmentConfigId];
-        if (fraction > 0) return fraction;
+    function _getFeeFraction(address feeReceiver) internal view returns (uint256) {
         // get default fraction
         return _feeFractions[feeReceiver];
     }
 
-    function _getFeeAmount(
-        uint256 employmentConfigId,
-        address feeReceiver,
-        uint256 amount
-    ) internal view returns (uint256) {
-        uint256 fraction = _getFeeFraction(employmentConfigId, feeReceiver);
+    function _getFeeAmount(address feeReceiver, uint256 amount) internal view returns (uint256) {
+        uint256 fraction = _getFeeFraction(feeReceiver);
         return (amount * fraction) / _feeDenominator();
     }
 

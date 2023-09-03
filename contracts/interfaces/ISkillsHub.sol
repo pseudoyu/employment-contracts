@@ -27,25 +27,11 @@ interface ISkillsHub {
     function initialize(address feeReceiver_) external;
 
     /**
-     * @notice Sets the default fee percentage of specific receiver.
-     * @dev The feeReceiver can be a platform account.
+     * @notice Sets the fee percentage of specific receiver.
      * @param feeReceiver The fee receiver address.
      * @param fraction The percentage measured in basis points. Each basis point represents 0.01%.
      */
-    function setDefaultFeeFraction(address feeReceiver, uint256 fraction) external;
-
-    /**
-     * @notice Sets the fee percentage of specific <receiver, employmentId>.
-     * @dev If this is set, it will override the default fee fraction.
-     * @param employmentConfigId The employment ID.
-     * @param feeReceiver The fee receiver address.
-     * @param fraction The percentage measured in basis points. Each basis point represents 0.01%.
-     */
-    function setFeeFraction(
-        uint256 employmentConfigId,
-        address feeReceiver,
-        uint256 fraction
-    ) external;
+    function setFeeFraction(address feeReceiver, uint256 fraction) external;
 
     /**
      * @notice Sets the employment config of specific employment id. <br>
@@ -57,6 +43,7 @@ interface ISkillsHub {
      * @param amount The amount of token.
      * @param startTime The start time of employment.
      * @param endTime The end time of employment.
+     * @param deadline The deadline of employment.
      * @param signature The signature of the message.
      */
     function setEmploymentConfig(
@@ -65,6 +52,7 @@ interface ISkillsHub {
         uint256 amount,
         uint256 startTime,
         uint256 endTime,
+        uint256 deadline,
         bytes memory signature
     ) external;
 
@@ -74,11 +62,13 @@ interface ISkillsHub {
      * @dev It will try to collect the employment first, and then update the employment config.
      * @param employmentConfigId The employment config ID to update.
      * @param endTime The end time of employment.
+     * @param deadline The deadline of employment.
      * @param signature The signature of the message.
      */
     function renewalEmploymentConfig(
         uint256 employmentConfigId,
         uint256 endTime,
+        uint256 deadline,
         bytes memory signature
     ) external;
 
@@ -102,27 +92,18 @@ interface ISkillsHub {
     /**
      * @notice Returns the fee percentage of specific <receiver, employment>.
      * @dev It will return the first non-zero value by priority feeFraction4Character and defaultFeeFraction.
-     * @param employmentConfigId The employment config ID.
      * @param feeReceiver The fee receiver address.
      * @return fraction The percentage measured in basis points. Each basis point represents 0.01%.
      */
-    function getFeeFraction(
-        uint256 employmentConfigId,
-        address feeReceiver
-    ) external view returns (uint256);
+    function getFeeFraction(address feeReceiver) external view returns (uint256);
 
     /**
      * @notice Returns how much the fee is owed by <feeFraction, employmentAmount>.
-     * @param employmentConfigId The employment config ID.
      * @param feeReceiver The fee receiver address.
      * @param amount The employment amount.
      * @return The fee amount.
      */
-    function getFeeAmount(
-        uint256 employmentConfigId,
-        address feeReceiver,
-        uint256 amount
-    ) external view returns (uint256);
+    function getFeeAmount(address feeReceiver, uint256 amount) external view returns (uint256);
 
     /**
      * @notice Return the employment config.
