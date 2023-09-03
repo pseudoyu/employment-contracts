@@ -171,7 +171,7 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="sigutils"><a class="header" href="#sigutils">SigUtils</a></h1>
-<p><a href="https://github.com/pseudoyu/openbuild-contracts/blob/97ebc12582dcec48802ef53754228c1eafe46a26/contracts/signature/SigUtils.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/openbuild-contracts/blob/b0ebe45469e2fe166cd5ce24f2de62cc03483541/contracts/signature/SigUtils.sol">Git Source</a></p>
 <h2 id="state-variables"><a class="header" href="#state-variables">State Variables</a></h2>
 <h3 id="domain_separator"><a class="header" href="#domain_separator">DOMAIN_SEPARATOR</a></h3>
 <pre><code class="language-solidity">bytes32 internal DOMAIN_SEPARATOR;
@@ -184,7 +184,7 @@
 <pre><code class="language-solidity">constructor(bytes32 _DOMAIN_SEPARATOR);
 </code></pre>
 <h3 id="getstructhash"><a class="header" href="#getstructhash">getStructHash</a></h3>
-<pre><code class="language-solidity">function getStructHash(Employ memory _employ) public view returns (bytes32);
+<pre><code class="language-solidity">function getStructHash(Employ memory _employ) public pure returns (bytes32);
 </code></pre>
 <h3 id="gettypeddatahash"><a class="header" href="#gettypeddatahash">getTypedDataHash</a></h3>
 <pre><code class="language-solidity">function getTypedDataHash(Employ memory _employ) public view returns (bytes32);
