@@ -4,7 +4,6 @@ pragma solidity 0.8.18;
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
 import {SigUtils} from "./SigUtils.sol";
-import "forge-std/console.sol";
 
 abstract contract Verifier is EIP712 {
     bytes32 public DOMAIN_SEPARATOR;

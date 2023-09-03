@@ -9,8 +9,6 @@ import {ISkillsHub} from "../contracts/interfaces/ISkillsHub.sol";
 import {SigUtils} from "../contracts/signature/SigUtils.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-// import "forge-std/console.sol";
-
 contract SkillsHubTest is CommonTest {
     uint256 public constant initialBalance = 100 ether;
 

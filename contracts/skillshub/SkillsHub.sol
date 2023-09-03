@@ -10,8 +10,6 @@ import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.s
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
 
-// import "forge-std/console.sol";
-
 /**
  * @title SkillsHub
  * @notice Logic to handle the employemnt that the employer can set the employment config for a cooperation.,
