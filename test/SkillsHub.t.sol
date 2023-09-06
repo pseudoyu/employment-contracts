@@ -75,6 +75,7 @@ contract SkillsHubTest is CommonTest {
     error SkillsHub__CancelEmployerInconsistent(address employer);
     error SkillsHub__ClaimSallaryDeveloperInconsistent(address developer);
     error SkillsHub__EmploymentNotStarted(uint256 startTime, uint256 claimTime);
+    error SkillsHub__SignatureExpire(uint256 deadline, uint256 currentTime);
 
     function setUp() public {
         _setUp();

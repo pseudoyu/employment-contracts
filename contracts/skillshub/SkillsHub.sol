@@ -37,6 +37,7 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
     error SkillsHub__CancelEmployerInconsistent(address employer);
     error SkillsHub__ClaimSallaryDeveloperInconsistent(address developer);
     error SkillsHub__EmploymentNotStarted(uint256 startTime, uint256 claimTime);
+    error SkillsHub__SignatureExpire(uint256 deadline, uint256 currentTime);
 
     // slither-disable-start naming-convention
     // address of web3Entry contract
@@ -155,6 +156,9 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
 
         if (amount <= 0) revert SkillsHub__ConfigAmountInvalid(amount);
 
+        if (block.timestamp > deadline)
+            revert SkillsHub__SignatureExpire(deadline, block.timestamp);
+
         uint256 employmentConfigId = ++_employmentConfigIndex;
 
         // add employments config
@@ -204,6 +208,9 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
 
         if (block.timestamp >= config.endTime)
             revert SkillsHub__RenewalEmploymentAlreadyEnded(config.endTime, block.timestamp);
+
+        if (block.timestamp > deadline)
+            revert SkillsHub__SignatureExpire(deadline, block.timestamp);
 
         // uint256 additonalAmount = (amount * (renewalTime - endTime)) / (endTime - startTime);
         uint256 additonalAmount = (config.amount * (endTime - config.endTime)) /
