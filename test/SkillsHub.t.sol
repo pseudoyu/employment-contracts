@@ -129,7 +129,7 @@ contract SkillsHubTest is CommonTest {
     function testSetEmploymentConfig(uint256 amount) public {
         uint256 startTime = block.timestamp;
         uint256 endTime = startTime + 1 days;
-        uint256 deadline = 123;
+        uint256 deadline = startTime + 2 days;
 
         // get random employment amount
         vm.assume(amount > 0 && amount <= 10);
@@ -186,7 +186,7 @@ contract SkillsHubTest is CommonTest {
     function testSetEmploymentConfigInsufficientAllowance(uint256 amount) public {
         uint256 startTime = block.timestamp;
         uint256 endTime = startTime + 1 days;
-        uint256 deadline = 123;
+        uint256 deadline = startTime + 2 days;
 
         // get random employment amount
         vm.assume(amount > 0 && amount <= 10);
@@ -223,7 +223,7 @@ contract SkillsHubTest is CommonTest {
     function testSetEmploymentConfigInsufficientBalance(uint256 amount) public {
         uint256 startTime = block.timestamp;
         uint256 endTime = startTime + 1 days;
-        uint256 deadline = 123;
+        uint256 deadline = startTime + 2 days;
 
         // get random employment amount
         vm.assume(amount > 2 && amount <= 10);
@@ -264,7 +264,7 @@ contract SkillsHubTest is CommonTest {
     function testSetEmploymentConfigSigFailed(uint256 amount) public {
         uint256 startTime = block.timestamp;
         uint256 endTime = startTime + 1 days;
-        uint256 deadline = 123;
+        uint256 deadline = startTime + 2 days;
 
         vm.assume(amount > 0);
 
@@ -293,13 +293,60 @@ contract SkillsHubTest is CommonTest {
         );
     }
 
+    function testSetEmploymentConfigSigExpired(uint256 amount) public {
+        uint256 startTime = block.timestamp;
+        uint256 endTime = startTime + 1 days;
+        uint256 deadline = startTime - 1;
+
+        // get random employment amount
+        vm.assume(amount > 0 && amount <= 10);
+
+        // transfer token
+        token.transfer(address(alice), amount);
+
+        // approve token
+        vm.prank(alice);
+        token.approve(address(skillsHub), amount);
+
+        // construct signature(signer: developer(bob))
+        SigUtils.Employ memory employ = SigUtils.Employ({
+            amount: amount / (endTime - startTime),
+            token: address(token),
+            deadline: deadline
+        });
+        bytes32 digest = sigUtils.getTypedDataHash(employ);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(bobPrivateKey, digest);
+        bytes memory signature = abi.encodePacked(r, s, v);
+
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                SkillsHub__SignatureExpire.selector,
+                uint256(deadline),
+                uint256(block.timestamp)
+            )
+        );
+        vm.prank(alice);
+        skillsHub.setEmploymentConfig(
+            bob,
+            address(token),
+            amount,
+            startTime,
+            endTime,
+            deadline,
+            signature
+        );
+
+        assertEq(token.balanceOf(alice), amount);
+        assertEq(token.balanceOf(address(skillsHub)), 0);
+    }
+
     function testRenewalEmploymentConfig(uint256 renewalTime) public {
         // set config
 
         uint256 startTime = block.timestamp;
         uint256 endTime = startTime + 3 days;
         renewalTime = endTime + 1 days;
-        uint256 deadline = 123;
+        uint256 deadline = startTime + 2 days;
 
         uint256 amount = 456789;
 
@@ -426,7 +473,7 @@ contract SkillsHubTest is CommonTest {
         // set config
         uint256 startTime = block.timestamp;
         uint256 endTime = startTime + 1 days;
-        uint256 deadline = 123;
+        uint256 deadline = block.timestamp + 2 days;
 
         // get random employment amount
         uint256 amount = 456789;
