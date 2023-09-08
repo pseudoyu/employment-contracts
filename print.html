@@ -180,7 +180,7 @@
 <h2 id="contract"><a class="header" href="#contract">Contract</a></h2>
 <h3 id="sepolia"><a class="header" href="#sepolia">Sepolia</a></h3>
 <ul>
-<li>SkillsHub: <code>0xCdD1288efF7DF493eeb962eDd3382E78ace2555a</code></li>
+<li>SkillsHub: <code>0x078F51A3E8BA285F24a9725C8deC1C3dA806cD5B</code></li>
 <li>OpenBuildToken: <code>0x521FD468fBba8d929bf22F3031b693A499841E55</code></li>
 </ul>
 <h2 id="deploy"><a class="header" href="#deploy">Deploy</a></h2>
@@ -206,7 +206,7 @@ PRIVATE_KEY=YOUR KEY HERE
 <li><a href="contracts/interfaces/ISkillsHub.sol/interface.ISkillsHub.html">ISkillsHub</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="iskillshub"><a class="header" href="#iskillshub">ISkillsHub</a></h1>
-<p><a href="https://github.com/pseudoyu/employment-contracts/blob/7b7ec9167954b747e206c2022347c88f8871b054/contracts/interfaces/ISkillsHub.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/employment-contracts/blob/d9f5c46ba2c97ce6c47d76942ecd6b3ac94640e5/contracts/interfaces/ISkillsHub.sol">Git Source</a></p>
 <p>This is the interface for the EmployWithConfig contract.</p>
 <h2 id="functions"><a class="header" href="#functions">Functions</a></h2>
 <h3 id="initialize"><a class="header" href="#initialize">initialize</a></h3>
@@ -379,7 +379,7 @@ Emits a {ClaimEmployment} event if claims successfully.</p>
 <li><a href="contracts/mocks/OpenBuildToken.sol/contract.OpenBuildToken.html">OpenBuildToken</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="openbuildtoken"><a class="header" href="#openbuildtoken">OpenBuildToken</a></h1>
-<p><a href="https://github.com/pseudoyu/employment-contracts/blob/7b7ec9167954b747e206c2022347c88f8871b054/contracts/mocks/OpenBuildToken.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/employment-contracts/blob/d9f5c46ba2c97ce6c47d76942ecd6b3ac94640e5/contracts/mocks/OpenBuildToken.sol">Git Source</a></p>
 <p><strong>Inherits:</strong>
 ERC20</p>
 <h2 id="functions-1"><a class="header" href="#functions-1">Functions</a></h2>
@@ -395,7 +395,7 @@ ERC20</p>
 <li><a href="contracts/signature/Verifier.sol/abstract.Verifier.html">Verifier</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="sigutils"><a class="header" href="#sigutils">SigUtils</a></h1>
-<p><a href="https://github.com/pseudoyu/employment-contracts/blob/7b7ec9167954b747e206c2022347c88f8871b054/contracts/signature/SigUtils.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/employment-contracts/blob/d9f5c46ba2c97ce6c47d76942ecd6b3ac94640e5/contracts/signature/SigUtils.sol">Git Source</a></p>
 <h2 id="state-variables"><a class="header" href="#state-variables">State Variables</a></h2>
 <h3 id="domain_separator"><a class="header" href="#domain_separator">DOMAIN_SEPARATOR</a></h3>
 <pre><code class="language-solidity">bytes32 internal DOMAIN_SEPARATOR;
@@ -423,7 +423,7 @@ ERC20</p>
 }
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="verifier"><a class="header" href="#verifier">Verifier</a></h1>
-<p><a href="https://github.com/pseudoyu/employment-contracts/blob/7b7ec9167954b747e206c2022347c88f8871b054/contracts/signature/Verifier.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/employment-contracts/blob/d9f5c46ba2c97ce6c47d76942ecd6b3ac94640e5/contracts/signature/Verifier.sol">Git Source</a></p>
 <p><strong>Inherits:</strong>
 EIP712</p>
 <h2 id="state-variables-1"><a class="header" href="#state-variables-1">State Variables</a></h2>
@@ -451,7 +451,7 @@ EIP712</p>
 <li><a href="contracts/skillshub/SkillsHub.sol/contract.SkillsHub.html">SkillsHub</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="skillshub"><a class="header" href="#skillshub">SkillsHub</a></h1>
-<p><a href="https://github.com/pseudoyu/employment-contracts/blob/7b7ec9167954b747e206c2022347c88f8871b054/contracts/skillshub/SkillsHub.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/employment-contracts/blob/d9f5c46ba2c97ce6c47d76942ecd6b3ac94640e5/contracts/skillshub/SkillsHub.sol">Git Source</a></p>
 <p><strong>Inherits:</strong>
 <a href="contracts/skillshub/SkillsHub.sol//contracts/signature/Verifier.sol/abstract.Verifier.html">Verifier</a>, <a href="contracts/skillshub/SkillsHub.sol//contracts/interfaces/ISkillsHub.sol/interface.ISkillsHub.html">ISkillsHub</a>, Initializable, ReentrancyGuard</p>
 <p>Logic to handle the employemnt that the employer can start the employment,</p>
@@ -646,9 +646,9 @@ Emits a {CancelEmployment} event.</p>
 <h3 id="startemployment-2"><a class="header" href="#startemployment-2">StartEmployment</a></h3>
 <p><em>Emitted when a employer start the employment.</em></p>
 <pre><code class="language-solidity">event StartEmployment(
-    uint256 indexed employmentId,
-    address indexed employerAddress,
-    address indexed developerAddress,
+    uint256 employmentId,
+    address employerAddress,
+    address developerAddress,
     address token,
     uint256 amount,
     uint256 time,
@@ -658,23 +658,17 @@ Emits a {CancelEmployment} event.</p>
 </code></pre>
 <h3 id="extendemployment-2"><a class="header" href="#extendemployment-2">ExtendEmployment</a></h3>
 <p><em>Emitted when a employer extend the employment.</em></p>
-<pre><code class="language-solidity">event ExtendEmployment(
-    uint256 indexed employmentId, uint256 indexed amount, uint256 indexed time, uint256 additonalAmount, uint256 endTime
-);
+<pre><code class="language-solidity">event ExtendEmployment(uint256 employmentId, uint256 amount, uint256 time, uint256 additonalAmount, uint256 endTime);
 </code></pre>
 <h3 id="claimfund-2"><a class="header" href="#claimfund-2">ClaimFund</a></h3>
 <p><em>Emitted when a developer claim the fund.</em></p>
 <pre><code class="language-solidity">event ClaimFund(
-    uint256 indexed employmentId,
-    uint256 indexed claimAmount,
-    uint256 indexed claimedAmount,
-    uint256 lastClaimedTime,
-    uint256 feeAmount
+    uint256 employmentId, uint256 claimAmount, uint256 claimedAmount, uint256 lastClaimedTime, uint256 feeAmount
 );
 </code></pre>
 <h3 id="cancelemployment-2"><a class="header" href="#cancelemployment-2">CancelEmployment</a></h3>
 <p><em>Emitted when a employer cancel the employment.</em></p>
-<pre><code class="language-solidity">event CancelEmployment(uint256 indexed employmentId, uint256 indexed refundedAmount, uint256 indexed cancelTime);
+<pre><code class="language-solidity">event CancelEmployment(uint256 employmentId, uint256 refundedAmount, uint256 cancelTime);
 </code></pre>
 <h2 id="errors"><a class="header" href="#errors">Errors</a></h2>
 <h3 id="skillshub__signerinvalid"><a class="header" href="#skillshub__signerinvalid">SkillsHub__SignerInvalid</a></h3>
