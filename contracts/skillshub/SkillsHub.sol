@@ -12,14 +12,14 @@ import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
 
 /**
  * @title SkillsHub
- * @notice Logic to handle the employemnt that the employer can set the employment config for a cooperation.,
- * @dev Employer can set config for a specific employment, and developer can claim the salary by config id.
+ * @notice Logic to handle the employemnt that the employer can start the employment,
+ * @dev Employer can start employment, and developer can claim the fund by employment id.
  *
- * For `SetEmploymentConfig`
- * Employer can set the employment config for a specific employment <br>
+ * For `StartEmployment`
+ * Employer can start the employment<br>
  *
- * For `claimSalary`
- * Anyone can claim the salary by employment id, and it will transfer all available tokens
+ * For `claimFund`
+ * Anyone can claim the fund by employment id, and it will transfer all available tokens
  * from the contract account to the `developer` account.
  */
 contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
@@ -27,94 +27,90 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
 
     // custom errors
     error SkillsHub__SignerInvalid(address signer);
-    error SkillsHub__EmploymentConfigIdInvalid(uint256 employmentConfigId);
-    error SkillsHub__EmploymentTimeInvalid(uint256 startTime, uint256 endTime);
-    error SkillsHub__RenewalTimeInvalid(uint256 endTime, uint256 renewalTime);
-    error SkillsHub__ConfigAmountInvalid(uint256 amount);
+    error SkillsHub__EmploymentIdInvalid(uint256 employmentId);
+    error SkillsHub__EmploymentTimeInvalid(uint256 time);
+    error SkillsHub__ExtendTimeInvalid(uint256 endTime, uint256 renewalTime);
+    error SkillsHub__AmountInvalid(uint256 amount);
     error SkillsHub__FractionOutOfRange(uint256 fraction);
-    error SkillsHub__RenewalEmployerInconsistent(address employer);
-    error SkillsHub__RenewalEmploymentAlreadyEnded(uint256 endTime, uint256 renewalTime);
+    error SkillsHub__ExtendEmployerInconsistent(address employer);
+    error SkillsHub__ExtendEmploymentAlreadyEnded(uint256 endTime, uint256 renewalTime);
     error SkillsHub__CancelEmployerInconsistent(address employer);
-    error SkillsHub__ClaimSallaryDeveloperInconsistent(address developer);
+    error SkillsHub__ClaimFundDeveloperInconsistent(address developer);
     error SkillsHub__EmploymentNotStarted(uint256 startTime, uint256 claimTime);
     error SkillsHub__SignatureExpire(uint256 deadline, uint256 currentTime);
 
     // slither-disable-start naming-convention
     // address of web3Entry contract
     address internal _feeReceiver;
+    uint256 internal _fraction;
 
-    uint256 internal _employmentConfigIndex;
-    mapping(uint256 employmentConfigId => EmploymentConfig) internal _employmentConfigs;
-    mapping(address feeReceiver => uint256 fraction) internal _feeFractions;
+    uint256 internal _employmentIndex;
+    mapping(uint256 employmentId => Employment) internal _employments;
     // slither-disable-end naming-convention
 
     // events
     /**
-     * @dev Emitted when a employer set the employment config.
-     * @param employmentConfigId The employment signature.
-     * @param employerAddress The employer address.```
+     * @dev Emitted when a employer start the employment.
+     * @param employmentId The employment signature.
+     * @param employerAddress The employer address.
      * @param developerAddress The developer address.
      * @param token The token address.
      * @param amount The amount of token.
+     * @param time The total time of employment.
      * @param startTime The start time of employment.
      * @param endTime The end time of employment.
      */
-    event SetEmploymentConfig(
-        uint256 indexed employmentConfigId,
+    event StartEmployment(
+        uint256 indexed employmentId,
         address indexed employerAddress,
         address indexed developerAddress,
         address token,
         uint256 amount,
+        uint256 time,
         uint256 startTime,
         uint256 endTime
     );
 
     /**
-     * @dev Emitted when a employer renewal the employment config.
-     * @param employmentConfigId The employment signature.
-     * @param employerAddress The employer address.```
-     * @param developerAddress The developer address.
-     * @param token The token address.
+     * @dev Emitted when a employer extend the employment.
+     * @param employmentId The employment signature.
      * @param amount The amount of token.
-     * @param additonalAmount The additonal amount of token.
-     * @param startTime The start time of employment.
+     * @param time The total time of employment.
+     * @param additonalAmount The additonal amount that should deposit.
      * @param endTime The end time of employment.
      */
-    event RenewalEmploymentConfig(
-        uint256 indexed employmentConfigId,
-        address indexed employerAddress,
-        address indexed developerAddress,
-        address token,
-        uint256 amount,
+    event ExtendEmployment(
+        uint256 indexed employmentId,
+        uint256 indexed amount,
+        uint256 indexed time,
         uint256 additonalAmount,
-        uint256 startTime,
         uint256 endTime
     );
 
     /**
-     * @dev Emitted when a developer claim the salary.
-     * @param employmentConfigId The employment signature.
-     * @param token The token address.
+     * @dev Emitted when a developer claim the fund.
+     * @param employmentId The employment signature.
      * @param claimAmount The amount of token.
      * @param lastClaimedTime The last claimed time.
      */
-    event ClaimSalary(
-        uint256 indexed employmentConfigId,
-        address indexed token,
+    event ClaimFund(
+        uint256 indexed employmentId,
         uint256 indexed claimAmount,
-        uint256 lastClaimedTime
+        uint256 indexed claimedAmount,
+        uint256 lastClaimedTime,
+        uint256 feeAmount
     );
 
     /**
-     * @dev Emitted when a developer claim the salary.
-     * @param employmentConfigId The employment signature.
-     * @param token The token address.
+     * @dev Emitted when a employer cancel the employment.
+     * @param employmentId The employment signature.
      * @param refundedAmount The amount of token.
+     * @param cancelTime The cancel time.
      */
     event CancelEmployment(
-        uint256 indexed employmentConfigId,
-        address indexed token,
-        uint256 indexed refundedAmount
+        uint256 indexed employmentId,
+        uint256 indexed refundedAmount,
+        uint256 indexed cancelTime
     );
 
     modifier validateFraction(uint256 fraction) {
@@ -123,9 +119,8 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
         _;
     }
 
-    modifier validEmploymentId(uint256 employmentConfigId) {
-        if (employmentConfigId <= 0)
-            revert SkillsHub__EmploymentConfigIdInvalid(employmentConfigId);
+    modifier validEmploymentId(uint256 employmentId) {
+        if (employmentId <= 0) revert SkillsHub__EmploymentIdInvalid(employmentId);
         _;
     }
 
@@ -139,221 +134,225 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
         address feeReceiver,
         uint256 fraction
     ) external override validateFraction(fraction) {
-        _feeFractions[feeReceiver] = fraction;
+        _feeReceiver = feeReceiver;
+        _fraction = fraction;
     }
 
     /// @inheritdoc ISkillsHub
-    function setEmploymentConfig(
+    function startEmployment(
         address developer,
         address token,
         uint256 amount,
-        uint256 startTime,
-        uint256 endTime,
+        uint256 time,
         uint256 deadline,
         bytes memory signature
     ) external override {
-        if (endTime <= startTime) revert SkillsHub__EmploymentTimeInvalid(startTime, endTime);
+        if (time <= 0) revert SkillsHub__EmploymentTimeInvalid(time);
 
-        if (amount <= 0) revert SkillsHub__ConfigAmountInvalid(amount);
+        if (amount <= 0) revert SkillsHub__AmountInvalid(amount);
 
         if (block.timestamp > deadline)
             revert SkillsHub__SignatureExpire(deadline, block.timestamp);
 
-        uint256 employmentConfigId = ++_employmentConfigIndex;
+        uint256 employmentId = ++_employmentIndex;
 
-        // add employments config
-        _employmentConfigs[employmentConfigId] = EmploymentConfig({
-            id: employmentConfigId,
+        // add employments
+        _employments[employmentId] = Employment({
             employer: msg.sender,
             developer: developer,
             token: token,
             amount: amount,
             claimedAmount: 0,
-            startTime: startTime,
-            endTime: endTime,
-            lastClaimedTime: 0
+            time: time,
+            startTime: block.timestamp,
+            endTime: block.timestamp + time
         });
 
-        address signer = _recoverEmploy(amount / (endTime - startTime), token, deadline, signature);
+        address signer = _recoverEmploy(amount, time, token, deadline, signature);
 
         if (signer != developer) revert SkillsHub__SignerInvalid(signer);
 
         IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
 
-        // set new employment config
-        emit SetEmploymentConfig(
-            employmentConfigId,
+        emit StartEmployment(
+            employmentId,
             msg.sender,
             developer,
             token,
             amount,
-            startTime,
-            endTime
+            time,
+            block.timestamp,
+            block.timestamp + time
         );
     }
 
     /// @inheritdoc ISkillsHub
-    function renewalEmploymentConfig(
-        uint256 employmentConfigId,
-        uint256 endTime,
+    function extendEmployment(
+        uint256 employmentId,
+        uint256 extendTime,
         uint256 deadline,
         bytes memory signature
-    ) external override validEmploymentId(employmentConfigId) {
-        EmploymentConfig storage config = _employmentConfigs[employmentConfigId];
-        if (msg.sender != config.employer)
-            revert SkillsHub__RenewalEmployerInconsistent(msg.sender);
+    ) external override validEmploymentId(employmentId) {
+        Employment storage employment = _employments[employmentId];
+        if (msg.sender != employment.employer)
+            revert SkillsHub__ExtendEmployerInconsistent(msg.sender);
 
-        if (endTime <= config.endTime)
-            revert SkillsHub__RenewalTimeInvalid(config.endTime, block.timestamp);
-
-        if (block.timestamp >= config.endTime)
-            revert SkillsHub__RenewalEmploymentAlreadyEnded(config.endTime, block.timestamp);
+        if (block.timestamp >= employment.endTime)
+            revert SkillsHub__ExtendEmploymentAlreadyEnded(employment.endTime, block.timestamp);
 
         if (block.timestamp > deadline)
             revert SkillsHub__SignatureExpire(deadline, block.timestamp);
 
-        // uint256 additonalAmount = (amount * (renewalTime - endTime)) / (endTime - startTime);
-        uint256 additonalAmount = (config.amount * (endTime - config.endTime)) /
-            (config.endTime - config.startTime);
+        uint256 additonalAmount = (employment.amount / employment.time) * extendTime;
 
-        config.endTime = endTime;
-        config.amount += additonalAmount;
+        employment.amount += additonalAmount;
+        employment.time += extendTime;
+        employment.endTime += extendTime;
 
         address signer = _recoverEmploy(
-            config.amount / (config.endTime - config.startTime),
-            config.token,
+            employment.amount,
+            employment.time,
+            employment.token,
             deadline,
             signature
         );
 
-        if (signer != config.developer) revert SkillsHub__SignerInvalid(signer);
+        if (signer != employment.developer) revert SkillsHub__SignerInvalid(signer);
 
-        IERC20(config.token).safeTransferFrom(config.employer, address(this), additonalAmount);
+        IERC20(employment.token).safeTransferFrom(
+            employment.employer,
+            address(this),
+            additonalAmount
+        );
 
-        // set new employment config
-        emit RenewalEmploymentConfig(
-            employmentConfigId,
-            msg.sender,
-            config.developer,
-            config.token,
-            config.amount,
+        emit ExtendEmployment(
+            employmentId,
+            employment.amount,
+            employment.time,
             additonalAmount,
-            config.startTime,
-            endTime
+            employment.endTime
         );
     }
 
     /// @inheritdoc ISkillsHub
     function cancelEmployment(
-        uint256 employmentConfigId
-    ) external override validEmploymentId(employmentConfigId) {
-        EmploymentConfig storage config = _employmentConfigs[employmentConfigId];
-        if (msg.sender != config.employer) revert SkillsHub__CancelEmployerInconsistent(msg.sender);
+        uint256 employmentId
+    ) external override validEmploymentId(employmentId) {
+        Employment storage employment = _employments[employmentId];
+        if (msg.sender != employment.employer)
+            revert SkillsHub__CancelEmployerInconsistent(msg.sender);
 
         // calculate the available funds
-        uint256 availableFund = _getAvailableSalary(
-            config.amount,
+        uint256 availableFund = _getAvailableFund(
+            employment.amount,
             block.timestamp,
-            config.startTime,
-            config.endTime
+            employment.startTime,
+            employment.endTime
         );
 
-        if (config.amount > availableFund) {
-            IERC20(config.token).safeTransfer(config.employer, config.amount - availableFund);
+        if (employment.amount > availableFund) {
+            IERC20(employment.token).safeTransfer(
+                employment.employer,
+                employment.amount - availableFund
+            );
         }
 
         // emit event
-        emit CancelEmployment(config.id, config.token, config.amount - availableFund);
+        emit CancelEmployment(employmentId, employment.amount - availableFund, block.timestamp);
 
         // delete employment config
-        delete _employmentConfigs[config.id];
+        delete _employments[employmentId];
     }
 
     // @inheritdoc ISkillsHub
-    function claimSalary(
-        uint256 employmentConfigId
-    ) external override validEmploymentId(employmentConfigId) nonReentrant {
-        EmploymentConfig storage config = _employmentConfigs[employmentConfigId];
-        if (msg.sender != config.developer)
-            revert SkillsHub__ClaimSallaryDeveloperInconsistent(msg.sender);
+    function claimFund(
+        uint256 employmentId
+    ) external override validEmploymentId(employmentId) nonReentrant {
+        Employment storage employment = _employments[employmentId];
+        if (msg.sender != employment.developer)
+            revert SkillsHub__ClaimFundDeveloperInconsistent(msg.sender);
 
-        if (block.timestamp < config.startTime)
-            revert SkillsHub__EmploymentNotStarted(config.startTime, block.timestamp);
+        if (block.timestamp < employment.startTime)
+            revert SkillsHub__EmploymentNotStarted(employment.startTime, block.timestamp);
 
         // calculate available funds
-        uint256 claimAmount = _getAvailableSalary(
-            config.amount,
+        uint256 claimAmount = _getAvailableFund(
+            employment.amount,
             block.timestamp,
-            config.startTime,
-            config.endTime
-        ) - config.claimedAmount;
+            employment.startTime,
+            employment.endTime
+        ) - employment.claimedAmount;
 
         // claim avaliable funds
+        uint256 fee = _getFeeAmount(claimAmount);
+
         if (claimAmount > 0) {
-            uint256 fee = _getFeeAmount(_feeReceiver, claimAmount);
-            IERC20(config.token).safeTransfer(config.developer, claimAmount - fee);
+            IERC20(employment.token).safeTransfer(employment.developer, claimAmount - fee);
 
             if (fee > 0) {
-                IERC20(config.token).safeTransfer(_feeReceiver, fee);
+                IERC20(employment.token).safeTransfer(_feeReceiver, fee);
             }
         }
 
-        config.claimedAmount += claimAmount;
-
-        config.lastClaimedTime = block.timestamp;
+        employment.claimedAmount += claimAmount;
 
         // emit event
-        emit ClaimSalary(config.id, config.token, claimAmount, config.lastClaimedTime);
+        emit ClaimFund(employmentId, claimAmount, employment.claimedAmount, block.timestamp, fee);
     }
 
     /// @inheritdoc ISkillsHub
-    function getFeeFraction(address feeReceiver) external view override returns (uint256) {
-        return _getFeeFraction(feeReceiver);
+    function getFeeFraction() external view override returns (uint256) {
+        return _fraction;
     }
 
     /// @inheritdoc ISkillsHub
-    function getFeeAmount(
-        address feeReceiver,
-        uint256 amount
-    ) external view override returns (uint256) {
-        return _getFeeAmount(feeReceiver, amount);
+    function getFeeAmount(uint256 amount) external view override returns (uint256) {
+        return _getFeeAmount(amount);
     }
 
     /// @inheritdoc ISkillsHub
-    function getEmploymentConfig(
-        uint256 employmentConfigId
+    function getEmploymentInfo(
+        uint256 employmentId
     )
         external
         view
         override
-        validEmploymentId(employmentConfigId)
-        returns (EmploymentConfig memory config)
+        validEmploymentId(employmentId)
+        returns (Employment memory employment)
     {
-        return _employmentConfigs[employmentConfigId];
+        return _employments[employmentId];
+    }
+
+    function getCurrentEmploymentIndex() external view override returns (uint256) {
+        return _employmentIndex;
     }
 
     /// @inheritdoc ISkillsHub
-    function getAvailableSalary(
-        uint256 employmentConfigId,
-        uint256 claimTimestamp
-    ) external view override validEmploymentId(employmentConfigId) returns (uint256) {
-        EmploymentConfig memory config = _employmentConfigs[employmentConfigId];
-        return
-            _getAvailableSalary(config.amount, claimTimestamp, config.startTime, config.endTime) -
-            config.claimedAmount;
+    function getAvailableFund(
+        uint256 employmentId
+    ) external view override validEmploymentId(employmentId) returns (uint256) {
+        Employment memory employment = _employments[employmentId];
+        uint256 availableFund = _getAvailableFund(
+            employment.amount,
+            block.timestamp,
+            employment.startTime,
+            employment.endTime
+        ) - employment.claimedAmount;
+
+        return availableFund - _getFeeAmount(availableFund);
     }
 
-    function _getFeeFraction(address feeReceiver) internal view returns (uint256) {
-        // get default fraction
-        return _feeFractions[feeReceiver];
+    /// @inheritdoc ISkillsHub
+    function getClaimedFund(uint256 employmentId) external view returns (uint256) {
+        Employment memory employment = _employments[employmentId];
+        return employment.claimedAmount;
     }
 
-    function _getFeeAmount(address feeReceiver, uint256 amount) internal view returns (uint256) {
-        uint256 fraction = _getFeeFraction(feeReceiver);
-        return (amount * fraction) / _feeDenominator();
+    function _getFeeAmount(uint256 amount) internal view returns (uint256) {
+        return (amount * _fraction) / _feeDenominator();
     }
 
-    function _getAvailableSalary(
+    function _getAvailableFund(
         uint256 amount,
         uint256 currentTime,
         uint256 startTime,

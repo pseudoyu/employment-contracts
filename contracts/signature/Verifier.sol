@@ -8,7 +8,7 @@ import {SigUtils} from "./SigUtils.sol";
 abstract contract Verifier is EIP712 {
     bytes32 public DOMAIN_SEPARATOR;
     bytes32 public constant EMPLOY_HASH =
-        keccak256("Employ(uint256 amount,address token,uint256 deadline)");
+        keccak256("Employ(uint256 amount,uint256 time,address token,uint256 deadline)");
 
     SigUtils internal sigUtils;
 
@@ -31,6 +31,7 @@ abstract contract Verifier is EIP712 {
 
     function _recoverEmploy(
         uint256 amount,
+        uint256 time,
         address token,
         uint256 deadline,
         bytes memory signature
@@ -44,7 +45,7 @@ abstract contract Verifier is EIP712 {
             v := byte(0, mload(add(signature, 0x60)))
         }
 
-        bytes32 digest = sigUtils.getTypedDataHash(SigUtils.Employ(amount, token, deadline));
+        bytes32 digest = sigUtils.getTypedDataHash(SigUtils.Employ(amount, time, token, deadline));
 
         return signAddr = ECDSA.recover(digest, v, r, s);
     }

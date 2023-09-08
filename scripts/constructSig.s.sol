@@ -29,8 +29,7 @@ contract ConstructSigScript is Script {
             )
         );
 
-        uint256 startTime = 1693973178;
-        uint256 endTime = 1694059578;
+        uint256 time = 1693973178;
         uint256 deadline = 1694145978;
         uint256 amount = 100000000;
 
@@ -41,7 +40,8 @@ contract ConstructSigScript is Script {
 
         // Construct new employment config
         SigUtils.Employ memory employ = SigUtils.Employ({
-            amount: amount / (endTime - startTime),
+            amount: amount,
+            time: time,
             token: address(token),
             deadline: deadline
         });
