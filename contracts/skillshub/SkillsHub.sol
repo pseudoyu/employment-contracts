@@ -61,9 +61,9 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
      * @param endTime The end time of employment.
      */
     event StartEmployment(
-        uint256 indexed employmentId,
-        address indexed employerAddress,
-        address indexed developerAddress,
+        uint256 employmentId,
+        address employerAddress,
+        address developerAddress,
         address token,
         uint256 amount,
         uint256 time,
@@ -80,9 +80,9 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
      * @param endTime The end time of employment.
      */
     event ExtendEmployment(
-        uint256 indexed employmentId,
-        uint256 indexed amount,
-        uint256 indexed time,
+        uint256 employmentId,
+        uint256 amount,
+        uint256 time,
         uint256 additonalAmount,
         uint256 endTime
     );
@@ -94,9 +94,9 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
      * @param lastClaimedTime The last claimed time.
      */
     event ClaimFund(
-        uint256 indexed employmentId,
-        uint256 indexed claimAmount,
-        uint256 indexed claimedAmount,
+        uint256 employmentId,
+        uint256 claimAmount,
+        uint256 claimedAmount,
         uint256 lastClaimedTime,
         uint256 feeAmount
     );
@@ -107,11 +107,7 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
      * @param refundedAmount The amount of token.
      * @param cancelTime The cancel time.
      */
-    event CancelEmployment(
-        uint256 indexed employmentId,
-        uint256 indexed refundedAmount,
-        uint256 indexed cancelTime
-    );
+    event CancelEmployment(uint256 employmentId, uint256 refundedAmount, uint256 cancelTime);
 
     modifier validateFraction(uint256 fraction) {
         if (fraction > _feeDenominator()) revert SkillsHub__FractionOutOfRange(fraction);

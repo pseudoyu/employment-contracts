@@ -16,9 +16,9 @@ contract SkillsHubTest is CommonTest {
 
     // events
     event StartEmployment(
-        uint256 indexed employmentId,
-        address indexed employerAddress,
-        address indexed developerAddress,
+        uint256 employmentId,
+        address employerAddress,
+        address developerAddress,
         address token,
         uint256 amount,
         uint256 time,
@@ -27,26 +27,22 @@ contract SkillsHubTest is CommonTest {
     );
 
     event ExtendEmployment(
-        uint256 indexed employmentId,
-        uint256 indexed amount,
-        uint256 indexed time,
+        uint256 employmentId,
+        uint256 amount,
+        uint256 time,
         uint256 additonalAmount,
         uint256 endTime
     );
 
     event ClaimFund(
-        uint256 indexed employmentId,
-        uint256 indexed claimAmount,
-        uint256 indexed claimedAmount,
+        uint256 employmentId,
+        uint256 claimAmount,
+        uint256 claimedAmount,
         uint256 lastClaimedTime,
         uint256 feeAmount
     );
 
-    event CancelEmployment(
-        uint256 indexed employmentId,
-        uint256 indexed refundedAmount,
-        uint256 indexed cancelTime
-    );
+    event CancelEmployment(uint256 employmentId, uint256 refundedAmount, uint256 cancelTime);
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
