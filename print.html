@@ -180,7 +180,7 @@
 <h2 id="contract"><a class="header" href="#contract">Contract</a></h2>
 <h3 id="sepolia"><a class="header" href="#sepolia">Sepolia</a></h3>
 <ul>
-<li>SkillsHub: <code>0x078F51A3E8BA285F24a9725C8deC1C3dA806cD5B</code></li>
+<li>SkillsHub: <code>0x6D9964EBe1E9E9e7b45E8A3112a29b82bF9Cc08E</code></li>
 <li>OpenBuildToken: <code>0x521FD468fBba8d929bf22F3031b693A499841E55</code></li>
 </ul>
 <h2 id="deploy"><a class="header" href="#deploy">Deploy</a></h2>
@@ -206,7 +206,7 @@ PRIVATE_KEY=YOUR KEY HERE
 <li><a href="contracts/interfaces/ISkillsHub.sol/interface.ISkillsHub.html">ISkillsHub</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="iskillshub"><a class="header" href="#iskillshub">ISkillsHub</a></h1>
-<p><a href="https://github.com/pseudoyu/employment-contracts/blob/d9f5c46ba2c97ce6c47d76942ecd6b3ac94640e5/contracts/interfaces/ISkillsHub.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/employment-contracts/blob/28a50bd6731007df7077a8112c059c288f6dcc8d/contracts/interfaces/ISkillsHub.sol">Git Source</a></p>
 <p>This is the interface for the EmployWithConfig contract.</p>
 <h2 id="functions"><a class="header" href="#functions">Functions</a></h2>
 <h3 id="initialize"><a class="header" href="#initialize">initialize</a></h3>
@@ -254,15 +254,12 @@ Emits a {StartEmployment} event.</p>
 <p>Extends the employment config of specific employment id. <br>
 Emits a {ExtendEmployment} event.</p>
 <p><em>It will try to collect the employment first, and then update the employment config.</em></p>
-<pre><code class="language-solidity">function extendEmployment(uint256 employmentId, uint256 extendTime, uint256 deadline, bytes memory signature)
-    external;
+<pre><code class="language-solidity">function extendEmployment(uint256 employmentId, uint256 extendTime) external;
 </code></pre>
 <p><strong>Parameters</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
 <tr><td><code>employmentId</code></td><td><code>uint256</code></td><td>The employment config ID to update.</td></tr>
 <tr><td><code>extendTime</code></td><td><code>uint256</code></td><td>The extend time of employment.</td></tr>
-<tr><td><code>deadline</code></td><td><code>uint256</code></td><td>The deadline of employment.</td></tr>
-<tr><td><code>signature</code></td><td><code>bytes</code></td><td>The signature of the message.</td></tr>
 </tbody></table>
 </div>
 <h3 id="cancelemployment"><a class="header" href="#cancelemployment">cancelEmployment</a></h3>
@@ -379,7 +376,7 @@ Emits a {ClaimEmployment} event if claims successfully.</p>
 <li><a href="contracts/mocks/OpenBuildToken.sol/contract.OpenBuildToken.html">OpenBuildToken</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="openbuildtoken"><a class="header" href="#openbuildtoken">OpenBuildToken</a></h1>
-<p><a href="https://github.com/pseudoyu/employment-contracts/blob/d9f5c46ba2c97ce6c47d76942ecd6b3ac94640e5/contracts/mocks/OpenBuildToken.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/employment-contracts/blob/28a50bd6731007df7077a8112c059c288f6dcc8d/contracts/mocks/OpenBuildToken.sol">Git Source</a></p>
 <p><strong>Inherits:</strong>
 ERC20</p>
 <h2 id="functions-1"><a class="header" href="#functions-1">Functions</a></h2>
@@ -395,7 +392,7 @@ ERC20</p>
 <li><a href="contracts/signature/Verifier.sol/abstract.Verifier.html">Verifier</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="sigutils"><a class="header" href="#sigutils">SigUtils</a></h1>
-<p><a href="https://github.com/pseudoyu/employment-contracts/blob/d9f5c46ba2c97ce6c47d76942ecd6b3ac94640e5/contracts/signature/SigUtils.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/employment-contracts/blob/28a50bd6731007df7077a8112c059c288f6dcc8d/contracts/signature/SigUtils.sol">Git Source</a></p>
 <h2 id="state-variables"><a class="header" href="#state-variables">State Variables</a></h2>
 <h3 id="domain_separator"><a class="header" href="#domain_separator">DOMAIN_SEPARATOR</a></h3>
 <pre><code class="language-solidity">bytes32 internal DOMAIN_SEPARATOR;
@@ -423,7 +420,7 @@ ERC20</p>
 }
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="verifier"><a class="header" href="#verifier">Verifier</a></h1>
-<p><a href="https://github.com/pseudoyu/employment-contracts/blob/d9f5c46ba2c97ce6c47d76942ecd6b3ac94640e5/contracts/signature/Verifier.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/employment-contracts/blob/28a50bd6731007df7077a8112c059c288f6dcc8d/contracts/signature/Verifier.sol">Git Source</a></p>
 <p><strong>Inherits:</strong>
 EIP712</p>
 <h2 id="state-variables-1"><a class="header" href="#state-variables-1">State Variables</a></h2>
@@ -451,7 +448,7 @@ EIP712</p>
 <li><a href="contracts/skillshub/SkillsHub.sol/contract.SkillsHub.html">SkillsHub</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="skillshub"><a class="header" href="#skillshub">SkillsHub</a></h1>
-<p><a href="https://github.com/pseudoyu/employment-contracts/blob/d9f5c46ba2c97ce6c47d76942ecd6b3ac94640e5/contracts/skillshub/SkillsHub.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/employment-contracts/blob/28a50bd6731007df7077a8112c059c288f6dcc8d/contracts/skillshub/SkillsHub.sol">Git Source</a></p>
 <p><strong>Inherits:</strong>
 <a href="contracts/skillshub/SkillsHub.sol//contracts/signature/Verifier.sol/abstract.Verifier.html">Verifier</a>, <a href="contracts/skillshub/SkillsHub.sol//contracts/interfaces/ISkillsHub.sol/interface.ISkillsHub.html">ISkillsHub</a>, Initializable, ReentrancyGuard</p>
 <p>Logic to handle the employemnt that the employer can start the employment,</p>
@@ -526,17 +523,12 @@ Emits a {StartEmployment} event.</p>
 <p>Extends the employment config of specific employment id. <br>
 Emits a {ExtendEmployment} event.</p>
 <p><em>It will try to collect the employment first, and then update the employment config.</em></p>
-<pre><code class="language-solidity">function extendEmployment(uint256 employmentId, uint256 extendTime, uint256 deadline, bytes memory signature)
-    external
-    override
-    validEmploymentId(employmentId);
+<pre><code class="language-solidity">function extendEmployment(uint256 employmentId, uint256 extendTime) external override validEmploymentId(employmentId);
 </code></pre>
 <p><strong>Parameters</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
 <tr><td><code>employmentId</code></td><td><code>uint256</code></td><td>The employment config ID to update.</td></tr>
 <tr><td><code>extendTime</code></td><td><code>uint256</code></td><td>The extend time of employment.</td></tr>
-<tr><td><code>deadline</code></td><td><code>uint256</code></td><td>The deadline of employment.</td></tr>
-<tr><td><code>signature</code></td><td><code>bytes</code></td><td>The signature of the message.</td></tr>
 </tbody></table>
 </div>
 <h3 id="cancelemployment-1"><a class="header" href="#cancelemployment-1">cancelEmployment</a></h3>
