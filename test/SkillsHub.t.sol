@@ -366,7 +366,7 @@ contract SkillsHubTest is CommonTest {
             endTime + extendTime
         );
         vm.prank(alice);
-        skillsHub.extendEmployment(1, extendTime, deadline, signature);
+        skillsHub.extendEmployment(1, extendTime);
 
         assertEq(token.balanceOf(address(skillsHub)), amount + additonalAmount);
         assertEq(token.balanceOf(alice), 0);

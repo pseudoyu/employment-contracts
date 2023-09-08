@@ -57,14 +57,10 @@ interface ISkillsHub {
      * @dev It will try to collect the employment first, and then update the employment config.
      * @param employmentId The employment config ID to update.
      * @param extendTime The extend time of employment.
-     * @param deadline The deadline of employment.
-     * @param signature The signature of the message.
      */
     function extendEmployment(
         uint256 employmentId,
-        uint256 extendTime,
-        uint256 deadline,
-        bytes memory signature
+        uint256 extendTime
     ) external;
 
     /**

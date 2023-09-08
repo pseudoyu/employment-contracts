@@ -185,9 +185,7 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
     /// @inheritdoc ISkillsHub
     function extendEmployment(
         uint256 employmentId,
-        uint256 extendTime,
-        uint256 deadline,
-        bytes memory signature
+        uint256 extendTime
     ) external override validEmploymentId(employmentId) {
         Employment storage employment = _employments[employmentId];
         if (msg.sender != employment.employer)
@@ -196,24 +194,11 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
         if (block.timestamp >= employment.endTime)
             revert SkillsHub__ExtendEmploymentAlreadyEnded(employment.endTime, block.timestamp);
 
-        if (block.timestamp > deadline)
-            revert SkillsHub__SignatureExpire(deadline, block.timestamp);
-
         uint256 additonalAmount = (employment.amount / employment.time) * extendTime;
 
         employment.amount += additonalAmount;
         employment.time += extendTime;
         employment.endTime += extendTime;
-
-        address signer = _recoverEmploy(
-            employment.amount,
-            employment.time,
-            employment.token,
-            deadline,
-            signature
-        );
-
-        if (signer != employment.developer) revert SkillsHub__SignerInvalid(signer);
 
         IERC20(employment.token).safeTransferFrom(
             employment.employer,
