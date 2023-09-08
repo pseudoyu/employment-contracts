@@ -172,15 +172,41 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="openbuild-contracts"><a class="header" href="#openbuild-contracts">openbuild-contracts</a></h1>
+<h2 id="docs"><a class="header" href="#docs">Docs</a></h2>
 <ul>
 <li><a href="https://app.heptabase.com/w/d996e9ee10666fdc0ebeeebf614665534bdc57ea89b6fff104dc8db924276462?id=b5527e3d-fbef-46a2-a953-020dd9ba0e92">Contract Design</a></li>
+<li><a href="https://openbuild-contracts.pseudoyu.com/">Contract Docs</a></li>
 </ul>
+<h2 id="contract"><a class="header" href="#contract">Contract</a></h2>
+<h3 id="sepolia"><a class="header" href="#sepolia">Sepolia</a></h3>
+<ul>
+<li>SkillsHub: <code>0xCdD1288efF7DF493eeb962eDd3382E78ace2555a</code></li>
+<li>OpenBuildToken: <code>0x521FD468fBba8d929bf22F3031b693A499841E55</code></li>
+</ul>
+<h2 id="deploy"><a class="header" href="#deploy">Deploy</a></h2>
+<h3 id="copy-envexample-to-env"><a class="header" href="#copy-envexample-to-env">copy .env.example to .env</a></h3>
+<pre><code class="language-bash">cp .env.example .env
+</code></pre>
+<h3 id="set-env"><a class="header" href="#set-env">set .env</a></h3>
+<pre><code class="language-text">ETHERSCAN_API_KEY=YOUR KEY HERE
+INFURA_API_KEY=YOUR KEY HERE
+PRIVATE_KEY=YOUR KEY HERE
+</code></pre>
+<h3 id="deploy-skillshub-to-testnetsepolia"><a class="header" href="#deploy-skillshub-to-testnetsepolia">deploy skillsHub to testnet(sepolia)</a></h3>
+<pre><code class="language-bash">yarn hardhat run scripts/deploySkillsHub.ts --network sepolia
+</code></pre>
+<h3 id="verify-skillshub"><a class="header" href="#verify-skillshub">verify skillsHub</a></h3>
+<pre><code class="language-bash">yarn hardhat verify --network sepolia &lt;Contract Address Here&gt;
+</code></pre>
+<h3 id="deploy-openbuildtoken-to-testnetsepolia"><a class="header" href="#deploy-openbuildtoken-to-testnetsepolia">Deploy OpenBuildToken to testnet(sepolia)</a></h3>
+<pre><code class="language-bash">yarn hardhat run scripts/deployOpenBuildToken.ts --network sepolia
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="contents"><a class="header" href="#contents">Contents</a></h1>
 <ul>
 <li><a href="contracts/interfaces/ISkillsHub.sol/interface.ISkillsHub.html">ISkillsHub</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="iskillshub"><a class="header" href="#iskillshub">ISkillsHub</a></h1>
-<p><a href="https://github.com/pseudoyu/employment-contracts/blob/7a2c2285b5f5e9243604b9a74d53e468df96332b/contracts/interfaces/ISkillsHub.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/employment-contracts/blob/7b7ec9167954b747e206c2022347c88f8871b054/contracts/interfaces/ISkillsHub.sol">Git Source</a></p>
 <p>This is the interface for the EmployWithConfig contract.</p>
 <h2 id="functions"><a class="header" href="#functions">Functions</a></h2>
 <h3 id="initialize"><a class="header" href="#initialize">initialize</a></h3>
@@ -353,7 +379,7 @@ Emits a {ClaimEmployment} event if claims successfully.</p>
 <li><a href="contracts/mocks/OpenBuildToken.sol/contract.OpenBuildToken.html">OpenBuildToken</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="openbuildtoken"><a class="header" href="#openbuildtoken">OpenBuildToken</a></h1>
-<p><a href="https://github.com/pseudoyu/employment-contracts/blob/7a2c2285b5f5e9243604b9a74d53e468df96332b/contracts/mocks/OpenBuildToken.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/employment-contracts/blob/7b7ec9167954b747e206c2022347c88f8871b054/contracts/mocks/OpenBuildToken.sol">Git Source</a></p>
 <p><strong>Inherits:</strong>
 ERC20</p>
 <h2 id="functions-1"><a class="header" href="#functions-1">Functions</a></h2>
@@ -369,7 +395,7 @@ ERC20</p>
 <li><a href="contracts/signature/Verifier.sol/abstract.Verifier.html">Verifier</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="sigutils"><a class="header" href="#sigutils">SigUtils</a></h1>
-<p><a href="https://github.com/pseudoyu/employment-contracts/blob/7a2c2285b5f5e9243604b9a74d53e468df96332b/contracts/signature/SigUtils.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/employment-contracts/blob/7b7ec9167954b747e206c2022347c88f8871b054/contracts/signature/SigUtils.sol">Git Source</a></p>
 <h2 id="state-variables"><a class="header" href="#state-variables">State Variables</a></h2>
 <h3 id="domain_separator"><a class="header" href="#domain_separator">DOMAIN_SEPARATOR</a></h3>
 <pre><code class="language-solidity">bytes32 internal DOMAIN_SEPARATOR;
@@ -397,7 +423,7 @@ ERC20</p>
 }
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="verifier"><a class="header" href="#verifier">Verifier</a></h1>
-<p><a href="https://github.com/pseudoyu/employment-contracts/blob/7a2c2285b5f5e9243604b9a74d53e468df96332b/contracts/signature/Verifier.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/employment-contracts/blob/7b7ec9167954b747e206c2022347c88f8871b054/contracts/signature/Verifier.sol">Git Source</a></p>
 <p><strong>Inherits:</strong>
 EIP712</p>
 <h2 id="state-variables-1"><a class="header" href="#state-variables-1">State Variables</a></h2>
@@ -425,7 +451,7 @@ EIP712</p>
 <li><a href="contracts/skillshub/SkillsHub.sol/contract.SkillsHub.html">SkillsHub</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="skillshub"><a class="header" href="#skillshub">SkillsHub</a></h1>
-<p><a href="https://github.com/pseudoyu/employment-contracts/blob/7a2c2285b5f5e9243604b9a74d53e468df96332b/contracts/skillshub/SkillsHub.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/employment-contracts/blob/7b7ec9167954b747e206c2022347c88f8871b054/contracts/skillshub/SkillsHub.sol">Git Source</a></p>
 <p><strong>Inherits:</strong>
 <a href="contracts/skillshub/SkillsHub.sol//contracts/signature/Verifier.sol/abstract.Verifier.html">Verifier</a>, <a href="contracts/skillshub/SkillsHub.sol//contracts/interfaces/ISkillsHub.sol/interface.ISkillsHub.html">ISkillsHub</a>, Initializable, ReentrancyGuard</p>
 <p>Logic to handle the employemnt that the employer can start the employment,</p>

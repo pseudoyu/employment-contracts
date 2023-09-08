@@ -171,9 +171,35 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="openbuild-contracts"><a class="header" href="#openbuild-contracts">openbuild-contracts</a></h1>
+<h2 id="docs"><a class="header" href="#docs">Docs</a></h2>
 <ul>
 <li><a href="https://app.heptabase.com/w/d996e9ee10666fdc0ebeeebf614665534bdc57ea89b6fff104dc8db924276462?id=b5527e3d-fbef-46a2-a953-020dd9ba0e92">Contract Design</a></li>
+<li><a href="https://openbuild-contracts.pseudoyu.com/">Contract Docs</a></li>
 </ul>
+<h2 id="contract"><a class="header" href="#contract">Contract</a></h2>
+<h3 id="sepolia"><a class="header" href="#sepolia">Sepolia</a></h3>
+<ul>
+<li>SkillsHub: <code>0xCdD1288efF7DF493eeb962eDd3382E78ace2555a</code></li>
+<li>OpenBuildToken: <code>0x521FD468fBba8d929bf22F3031b693A499841E55</code></li>
+</ul>
+<h2 id="deploy"><a class="header" href="#deploy">Deploy</a></h2>
+<h3 id="copy-envexample-to-env"><a class="header" href="#copy-envexample-to-env">copy .env.example to .env</a></h3>
+<pre><code class="language-bash">cp .env.example .env
+</code></pre>
+<h3 id="set-env"><a class="header" href="#set-env">set .env</a></h3>
+<pre><code class="language-text">ETHERSCAN_API_KEY=YOUR KEY HERE
+INFURA_API_KEY=YOUR KEY HERE
+PRIVATE_KEY=YOUR KEY HERE
+</code></pre>
+<h3 id="deploy-skillshub-to-testnetsepolia"><a class="header" href="#deploy-skillshub-to-testnetsepolia">deploy skillsHub to testnet(sepolia)</a></h3>
+<pre><code class="language-bash">yarn hardhat run scripts/deploySkillsHub.ts --network sepolia
+</code></pre>
+<h3 id="verify-skillshub"><a class="header" href="#verify-skillshub">verify skillsHub</a></h3>
+<pre><code class="language-bash">yarn hardhat verify --network sepolia &lt;Contract Address Here&gt;
+</code></pre>
+<h3 id="deploy-openbuildtoken-to-testnetsepolia"><a class="header" href="#deploy-openbuildtoken-to-testnetsepolia">Deploy OpenBuildToken to testnet(sepolia)</a></h3>
+<pre><code class="language-bash">yarn hardhat run scripts/deployOpenBuildToken.ts --network sepolia
+</code></pre>
 
                     </main>
 
