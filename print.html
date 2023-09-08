@@ -180,7 +180,7 @@
 <li><a href="contracts/interfaces/ISkillsHub.sol/interface.ISkillsHub.html">ISkillsHub</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="iskillshub"><a class="header" href="#iskillshub">ISkillsHub</a></h1>
-<p><a href="https://github.com/pseudoyu/employment-contracts/blob/adafb45a350d2a1f0df02dad44a7daf6a83cb8c1/contracts/interfaces/ISkillsHub.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/employment-contracts/blob/7a2c2285b5f5e9243604b9a74d53e468df96332b/contracts/interfaces/ISkillsHub.sol">Git Source</a></p>
 <p>This is the interface for the EmployWithConfig contract.</p>
 <h2 id="functions"><a class="header" href="#functions">Functions</a></h2>
 <h3 id="initialize"><a class="header" href="#initialize">initialize</a></h3>
@@ -202,17 +202,14 @@
 <tr><td><code>fraction</code></td><td><code>uint256</code></td><td>The percentage measured in basis points. Each basis point represents 0.01%.</td></tr>
 </tbody></table>
 </div>
-<h3 id="setemploymentconfig"><a class="header" href="#setemploymentconfig">setEmploymentConfig</a></h3>
-<p>Sets the employment config of specific employment id. <br>
-Emits a {SetEmploymentConfig} event.</p>
-<p><em>If the employment config of specific &lt;fromCharacter, toCharacter&gt; is already,
-it will try to collect the employment first, and then override the employment config.</em></p>
-<pre><code class="language-solidity">function setEmploymentConfig(
+<h3 id="startemployment"><a class="header" href="#startemployment">startEmployment</a></h3>
+<p>Start the employment of specific employment id. <br>
+Emits a {StartEmployment} event.</p>
+<pre><code class="language-solidity">function startEmployment(
     address develper,
     address token,
     uint256 amount,
-    uint256 startTime,
-    uint256 endTime,
+    uint256 time,
     uint256 deadline,
     bytes memory signature
 ) external;
@@ -222,23 +219,22 @@ it will try to collect the employment first, and then override the employment co
 <tr><td><code>develper</code></td><td><code>address</code></td><td>The developer address.</td></tr>
 <tr><td><code>token</code></td><td><code>address</code></td><td>The token address.</td></tr>
 <tr><td><code>amount</code></td><td><code>uint256</code></td><td>The amount of token.</td></tr>
-<tr><td><code>startTime</code></td><td><code>uint256</code></td><td>The start time of employment.</td></tr>
-<tr><td><code>endTime</code></td><td><code>uint256</code></td><td>The end time of employment.</td></tr>
+<tr><td><code>time</code></td><td><code>uint256</code></td><td>The time of employment.</td></tr>
 <tr><td><code>deadline</code></td><td><code>uint256</code></td><td>The deadline of employment.</td></tr>
 <tr><td><code>signature</code></td><td><code>bytes</code></td><td>The signature of the message.</td></tr>
 </tbody></table>
 </div>
-<h3 id="renewalemploymentconfig"><a class="header" href="#renewalemploymentconfig">renewalEmploymentConfig</a></h3>
-<p>Updates the employment config of specific employment id. <br>
-Emits a {UpdateEmploymentConfig} event.</p>
+<h3 id="extendemployment"><a class="header" href="#extendemployment">extendEmployment</a></h3>
+<p>Extends the employment config of specific employment id. <br>
+Emits a {ExtendEmployment} event.</p>
 <p><em>It will try to collect the employment first, and then update the employment config.</em></p>
-<pre><code class="language-solidity">function renewalEmploymentConfig(uint256 employmentConfigId, uint256 endTime, uint256 deadline, bytes memory signature)
+<pre><code class="language-solidity">function extendEmployment(uint256 employmentId, uint256 extendTime, uint256 deadline, bytes memory signature)
     external;
 </code></pre>
 <p><strong>Parameters</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>employmentConfigId</code></td><td><code>uint256</code></td><td>The employment config ID to update.</td></tr>
-<tr><td><code>endTime</code></td><td><code>uint256</code></td><td>The end time of employment.</td></tr>
+<tr><td><code>employmentId</code></td><td><code>uint256</code></td><td>The employment config ID to update.</td></tr>
+<tr><td><code>extendTime</code></td><td><code>uint256</code></td><td>The extend time of employment.</td></tr>
 <tr><td><code>deadline</code></td><td><code>uint256</code></td><td>The deadline of employment.</td></tr>
 <tr><td><code>signature</code></td><td><code>bytes</code></td><td>The signature of the message.</td></tr>
 </tbody></table>
@@ -248,34 +244,29 @@ Emits a {UpdateEmploymentConfig} event.</p>
 Emits a {CancelEmployment} event.</p>
 <p><em>It will try to collect the remaining assets first, and then delete the employment config.</em></p>
 <p><em>Only the employment creator can cancel the employment.</em></p>
-<pre><code class="language-solidity">function cancelEmployment(uint256 employmentConfigId) external;
+<pre><code class="language-solidity">function cancelEmployment(uint256 employmentId) external;
 </code></pre>
 <p><strong>Parameters</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>employmentConfigId</code></td><td><code>uint256</code></td><td>The employment config ID to cancel.</td></tr>
+<tr><td><code>employmentId</code></td><td><code>uint256</code></td><td>The employment config ID to cancel.</td></tr>
 </tbody></table>
 </div>
-<h3 id="claimsalary"><a class="header" href="#claimsalary">claimSalary</a></h3>
+<h3 id="claimfund"><a class="header" href="#claimfund">claimFund</a></h3>
 <p>Claims all unredeemed salary from the contract to developer address. <br>
 Emits a {ClaimEmployment} event if claims successfully.</p>
 <p><em>It will transfer all unredeemed token from the contract to the <code>developer</code>.</em></p>
-<pre><code class="language-solidity">function claimSalary(uint256 employmentConfigId) external;
+<pre><code class="language-solidity">function claimFund(uint256 employmentId) external;
 </code></pre>
 <p><strong>Parameters</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>employmentConfigId</code></td><td><code>uint256</code></td><td>The employment config ID.</td></tr>
+<tr><td><code>employmentId</code></td><td><code>uint256</code></td><td>The employment config ID.</td></tr>
 </tbody></table>
 </div>
 <h3 id="getfeefraction"><a class="header" href="#getfeefraction">getFeeFraction</a></h3>
 <p>Returns the fee percentage of specific &lt;receiver, employment&gt;.</p>
 <p><em>It will return the first non-zero value by priority feeFraction4Character and defaultFeeFraction.</em></p>
-<pre><code class="language-solidity">function getFeeFraction(address feeReceiver) external view returns (uint256);
+<pre><code class="language-solidity">function getFeeFraction() external view returns (uint256);
 </code></pre>
-<p><strong>Parameters</strong></p>
-<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>feeReceiver</code></td><td><code>address</code></td><td>The fee receiver address.</td></tr>
-</tbody></table>
-</div>
 <p><strong>Returns</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
 <tr><td><code>&lt;none&gt;</code></td><td><code>uint256</code></td><td>fraction The percentage measured in basis points. Each basis point represents 0.01%.</td></tr>
@@ -283,11 +274,10 @@ Emits a {ClaimEmployment} event if claims successfully.</p>
 </div>
 <h3 id="getfeeamount"><a class="header" href="#getfeeamount">getFeeAmount</a></h3>
 <p>Returns how much the fee is owed by &lt;feeFraction, employmentAmount&gt;.</p>
-<pre><code class="language-solidity">function getFeeAmount(address feeReceiver, uint256 amount) external view returns (uint256);
+<pre><code class="language-solidity">function getFeeAmount(uint256 amount) external view returns (uint256);
 </code></pre>
 <p><strong>Parameters</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>feeReceiver</code></td><td><code>address</code></td><td>The fee receiver address.</td></tr>
 <tr><td><code>amount</code></td><td><code>uint256</code></td><td>The employment amount.</td></tr>
 </tbody></table>
 </div>
@@ -296,43 +286,66 @@ Emits a {ClaimEmployment} event if claims successfully.</p>
 <tr><td><code>&lt;none&gt;</code></td><td><code>uint256</code></td><td>The fee amount.</td></tr>
 </tbody></table>
 </div>
-<h3 id="getemploymentconfig"><a class="header" href="#getemploymentconfig">getEmploymentConfig</a></h3>
+<h3 id="getemploymentinfo"><a class="header" href="#getemploymentinfo">getEmploymentInfo</a></h3>
 <p>Return the employment config.</p>
-<pre><code class="language-solidity">function getEmploymentConfig(uint256 employmentConfigId) external view returns (EmploymentConfig memory config);
+<pre><code class="language-solidity">function getEmploymentInfo(uint256 employmentId) external view returns (Employment memory employment);
 </code></pre>
 <p><strong>Parameters</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>employmentConfigId</code></td><td><code>uint256</code></td><td>The employment config ID.</td></tr>
+<tr><td><code>employmentId</code></td><td><code>uint256</code></td><td>The employment config ID.</td></tr>
 </tbody></table>
 </div>
-<h3 id="getavailablesalary"><a class="header" href="#getavailablesalary">getAvailableSalary</a></h3>
-<p>Returns the available salary of specific &lt;employment, claimTimestamp&gt;.</p>
-<p><em>It will return the available salary of specific &lt;employment, claimTimestamp&gt;.</em></p>
-<pre><code class="language-solidity">function getAvailableSalary(uint256 employmentConfigId, uint256 claimTimestamp) external view returns (uint256);
+<h3 id="getavailablefund"><a class="header" href="#getavailablefund">getAvailableFund</a></h3>
+<p>Returns the available fund of specific &lt;employment, claimTimestamp&gt;.</p>
+<p><em>It will return the available fund of specific employment.</em></p>
+<pre><code class="language-solidity">function getAvailableFund(uint256 employmentId) external view returns (uint256);
 </code></pre>
 <p><strong>Parameters</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>employmentConfigId</code></td><td><code>uint256</code></td><td>The employment config ID.</td></tr>
-<tr><td><code>claimTimestamp</code></td><td><code>uint256</code></td><td>The claim time.</td></tr>
+<tr><td><code>employmentId</code></td><td><code>uint256</code></td><td>The employment ID.</td></tr>
 </tbody></table>
 </div>
 <p><strong>Returns</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>&lt;none&gt;</code></td><td><code>uint256</code></td><td>The available salary.</td></tr>
+<tr><td><code>&lt;none&gt;</code></td><td><code>uint256</code></td><td>The available fund.</td></tr>
+</tbody></table>
+</div>
+<h3 id="getclaimedfund"><a class="header" href="#getclaimedfund">getClaimedFund</a></h3>
+<p>Returns the claimed fund of specific employment.</p>
+<p><em>It will return the claimed fund of specific employment.</em></p>
+<pre><code class="language-solidity">function getClaimedFund(uint256 employmentId) external view returns (uint256);
+</code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>employmentId</code></td><td><code>uint256</code></td><td>The employment config ID.</td></tr>
+</tbody></table>
+</div>
+<p><strong>Returns</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>&lt;none&gt;</code></td><td><code>uint256</code></td><td>The claimed fund.</td></tr>
+</tbody></table>
+</div>
+<h3 id="getcurrentemploymentindex"><a class="header" href="#getcurrentemploymentindex">getCurrentEmploymentIndex</a></h3>
+<p>Returns the current employment index.</p>
+<p><em>It will return the current employment index.</em></p>
+<pre><code class="language-solidity">function getCurrentEmploymentIndex() external view returns (uint256);
+</code></pre>
+<p><strong>Returns</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>&lt;none&gt;</code></td><td><code>uint256</code></td><td>The current employment index.</td></tr>
 </tbody></table>
 </div>
 <h2 id="structs"><a class="header" href="#structs">Structs</a></h2>
-<h3 id="employmentconfig"><a class="header" href="#employmentconfig">EmploymentConfig</a></h3>
-<pre><code class="language-solidity">struct EmploymentConfig {
-    uint256 id;
+<h3 id="employment"><a class="header" href="#employment">Employment</a></h3>
+<pre><code class="language-solidity">struct Employment {
     address employer;
     address developer;
     address token;
     uint256 amount;
     uint256 claimedAmount;
+    uint256 time;
     uint256 startTime;
     uint256 endTime;
-    uint256 lastClaimedTime;
 }
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="contents-1"><a class="header" href="#contents-1">Contents</a></h1>
@@ -340,7 +353,7 @@ Emits a {ClaimEmployment} event if claims successfully.</p>
 <li><a href="contracts/mocks/OpenBuildToken.sol/contract.OpenBuildToken.html">OpenBuildToken</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="openbuildtoken"><a class="header" href="#openbuildtoken">OpenBuildToken</a></h1>
-<p><a href="https://github.com/pseudoyu/employment-contracts/blob/adafb45a350d2a1f0df02dad44a7daf6a83cb8c1/contracts/mocks/OpenBuildToken.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/employment-contracts/blob/7a2c2285b5f5e9243604b9a74d53e468df96332b/contracts/mocks/OpenBuildToken.sol">Git Source</a></p>
 <p><strong>Inherits:</strong>
 ERC20</p>
 <h2 id="functions-1"><a class="header" href="#functions-1">Functions</a></h2>
@@ -356,13 +369,13 @@ ERC20</p>
 <li><a href="contracts/signature/Verifier.sol/abstract.Verifier.html">Verifier</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="sigutils"><a class="header" href="#sigutils">SigUtils</a></h1>
-<p><a href="https://github.com/pseudoyu/employment-contracts/blob/adafb45a350d2a1f0df02dad44a7daf6a83cb8c1/contracts/signature/SigUtils.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/employment-contracts/blob/7a2c2285b5f5e9243604b9a74d53e468df96332b/contracts/signature/SigUtils.sol">Git Source</a></p>
 <h2 id="state-variables"><a class="header" href="#state-variables">State Variables</a></h2>
 <h3 id="domain_separator"><a class="header" href="#domain_separator">DOMAIN_SEPARATOR</a></h3>
 <pre><code class="language-solidity">bytes32 internal DOMAIN_SEPARATOR;
 </code></pre>
 <h3 id="employ_hash"><a class="header" href="#employ_hash">EMPLOY_HASH</a></h3>
-<pre><code class="language-solidity">bytes32 public constant EMPLOY_HASH = keccak256(&quot;Employ(uint256 amount,address token,uint256 deadline)&quot;);
+<pre><code class="language-solidity">bytes32 public constant EMPLOY_HASH = keccak256(&quot;Employ(uint256 amount,uint256 time,address token,uint256 deadline)&quot;);
 </code></pre>
 <h2 id="functions-2"><a class="header" href="#functions-2">Functions</a></h2>
 <h3 id="constructor-1"><a class="header" href="#constructor-1">constructor</a></h3>
@@ -378,12 +391,13 @@ ERC20</p>
 <h3 id="employ"><a class="header" href="#employ">Employ</a></h3>
 <pre><code class="language-solidity">struct Employ {
     uint256 amount;
+    uint256 time;
     address token;
     uint256 deadline;
 }
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="verifier"><a class="header" href="#verifier">Verifier</a></h1>
-<p><a href="https://github.com/pseudoyu/employment-contracts/blob/adafb45a350d2a1f0df02dad44a7daf6a83cb8c1/contracts/signature/Verifier.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/employment-contracts/blob/7a2c2285b5f5e9243604b9a74d53e468df96332b/contracts/signature/Verifier.sol">Git Source</a></p>
 <p><strong>Inherits:</strong>
 EIP712</p>
 <h2 id="state-variables-1"><a class="header" href="#state-variables-1">State Variables</a></h2>
@@ -391,7 +405,7 @@ EIP712</p>
 <pre><code class="language-solidity">bytes32 public DOMAIN_SEPARATOR;
 </code></pre>
 <h3 id="employ_hash-1"><a class="header" href="#employ_hash-1">EMPLOY_HASH</a></h3>
-<pre><code class="language-solidity">bytes32 public constant EMPLOY_HASH = keccak256(&quot;Employ(uint256 amount,address token,uint256 deadline)&quot;);
+<pre><code class="language-solidity">bytes32 public constant EMPLOY_HASH = keccak256(&quot;Employ(uint256 amount,uint256 time,address token,uint256 deadline)&quot;);
 </code></pre>
 <h3 id="sigutils-1"><a class="header" href="#sigutils-1">sigUtils</a></h3>
 <pre><code class="language-solidity">SigUtils internal sigUtils;
@@ -401,7 +415,7 @@ EIP712</p>
 <pre><code class="language-solidity">constructor() EIP712(&quot;Employment&quot;, &quot;1&quot;);
 </code></pre>
 <h3 id="_recoveremploy"><a class="header" href="#_recoveremploy">_recoverEmploy</a></h3>
-<pre><code class="language-solidity">function _recoverEmploy(uint256 amount, address token, uint256 deadline, bytes memory signature)
+<pre><code class="language-solidity">function _recoverEmploy(uint256 amount, uint256 time, address token, uint256 deadline, bytes memory signature)
     internal
     view
     returns (address signAddr);
@@ -411,35 +425,35 @@ EIP712</p>
 <li><a href="contracts/skillshub/SkillsHub.sol/contract.SkillsHub.html">SkillsHub</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="skillshub"><a class="header" href="#skillshub">SkillsHub</a></h1>
-<p><a href="https://github.com/pseudoyu/employment-contracts/blob/adafb45a350d2a1f0df02dad44a7daf6a83cb8c1/contracts/skillshub/SkillsHub.sol">Git Source</a></p>
+<p><a href="https://github.com/pseudoyu/employment-contracts/blob/7a2c2285b5f5e9243604b9a74d53e468df96332b/contracts/skillshub/SkillsHub.sol">Git Source</a></p>
 <p><strong>Inherits:</strong>
 <a href="contracts/skillshub/SkillsHub.sol//contracts/signature/Verifier.sol/abstract.Verifier.html">Verifier</a>, <a href="contracts/skillshub/SkillsHub.sol//contracts/interfaces/ISkillsHub.sol/interface.ISkillsHub.html">ISkillsHub</a>, Initializable, ReentrancyGuard</p>
-<p>Logic to handle the employemnt that the employer can set the employment config for a cooperation.,</p>
-<p><em>Employer can set config for a specific employment, and developer can claim the salary by config id.
-For <code>SetEmploymentConfig</code>
-Employer can set the employment config for a specific employment <br>
-For <code>claimSalary</code>
-Anyone can claim the salary by employment id, and it will transfer all available tokens
+<p>Logic to handle the employemnt that the employer can start the employment,</p>
+<p><em>Employer can start employment, and developer can claim the fund by employment id.
+For <code>StartEmployment</code>
+Employer can start the employment<br>
+For <code>claimFund</code>
+Anyone can claim the fund by employment id, and it will transfer all available tokens
 from the contract account to the <code>developer</code> account.</em></p>
 <h2 id="state-variables-2"><a class="header" href="#state-variables-2">State Variables</a></h2>
 <h3 id="_feereceiver"><a class="header" href="#_feereceiver">_feeReceiver</a></h3>
 <pre><code class="language-solidity">address internal _feeReceiver;
 </code></pre>
-<h3 id="_employmentconfigindex"><a class="header" href="#_employmentconfigindex">_employmentConfigIndex</a></h3>
-<pre><code class="language-solidity">uint256 internal _employmentConfigIndex;
+<h3 id="_fraction"><a class="header" href="#_fraction">_fraction</a></h3>
+<pre><code class="language-solidity">uint256 internal _fraction;
 </code></pre>
-<h3 id="_employmentconfigs"><a class="header" href="#_employmentconfigs">_employmentConfigs</a></h3>
-<pre><code class="language-solidity">mapping(uint256 employmentConfigId =&gt; EmploymentConfig) internal _employmentConfigs;
+<h3 id="_employmentindex"><a class="header" href="#_employmentindex">_employmentIndex</a></h3>
+<pre><code class="language-solidity">uint256 internal _employmentIndex;
 </code></pre>
-<h3 id="_feefractions"><a class="header" href="#_feefractions">_feeFractions</a></h3>
-<pre><code class="language-solidity">mapping(address feeReceiver =&gt; uint256 fraction) internal _feeFractions;
+<h3 id="_employments"><a class="header" href="#_employments">_employments</a></h3>
+<pre><code class="language-solidity">mapping(uint256 employmentId =&gt; Employment) internal _employments;
 </code></pre>
 <h2 id="functions-4"><a class="header" href="#functions-4">Functions</a></h2>
 <h3 id="validatefraction"><a class="header" href="#validatefraction">validateFraction</a></h3>
 <pre><code class="language-solidity">modifier validateFraction(uint256 fraction);
 </code></pre>
 <h3 id="validemploymentid"><a class="header" href="#validemploymentid">validEmploymentId</a></h3>
-<pre><code class="language-solidity">modifier validEmploymentId(uint256 employmentConfigId);
+<pre><code class="language-solidity">modifier validEmploymentId(uint256 employmentId);
 </code></pre>
 <h3 id="initialize-1"><a class="header" href="#initialize-1">initialize</a></h3>
 <p>Initialize the contract, setting web3Entry address.</p>
@@ -460,17 +474,14 @@ from the contract account to the <code>developer</code> account.</em></p>
 <tr><td><code>fraction</code></td><td><code>uint256</code></td><td>The percentage measured in basis points. Each basis point represents 0.01%.</td></tr>
 </tbody></table>
 </div>
-<h3 id="setemploymentconfig-1"><a class="header" href="#setemploymentconfig-1">setEmploymentConfig</a></h3>
-<p>Sets the employment config of specific employment id. <br>
-Emits a {SetEmploymentConfig} event.</p>
-<p><em>If the employment config of specific &lt;fromCharacter, toCharacter&gt; is already,
-it will try to collect the employment first, and then override the employment config.</em></p>
-<pre><code class="language-solidity">function setEmploymentConfig(
+<h3 id="startemployment-1"><a class="header" href="#startemployment-1">startEmployment</a></h3>
+<p>Start the employment of specific employment id. <br>
+Emits a {StartEmployment} event.</p>
+<pre><code class="language-solidity">function startEmployment(
     address developer,
     address token,
     uint256 amount,
-    uint256 startTime,
-    uint256 endTime,
+    uint256 time,
     uint256 deadline,
     bytes memory signature
 ) external override;
@@ -480,25 +491,24 @@ it will try to collect the employment first, and then override the employment co
 <tr><td><code>developer</code></td><td><code>address</code></td><td></td></tr>
 <tr><td><code>token</code></td><td><code>address</code></td><td>The token address.</td></tr>
 <tr><td><code>amount</code></td><td><code>uint256</code></td><td>The amount of token.</td></tr>
-<tr><td><code>startTime</code></td><td><code>uint256</code></td><td>The start time of employment.</td></tr>
-<tr><td><code>endTime</code></td><td><code>uint256</code></td><td>The end time of employment.</td></tr>
+<tr><td><code>time</code></td><td><code>uint256</code></td><td>The time of employment.</td></tr>
 <tr><td><code>deadline</code></td><td><code>uint256</code></td><td>The deadline of employment.</td></tr>
 <tr><td><code>signature</code></td><td><code>bytes</code></td><td>The signature of the message.</td></tr>
 </tbody></table>
 </div>
-<h3 id="renewalemploymentconfig-1"><a class="header" href="#renewalemploymentconfig-1">renewalEmploymentConfig</a></h3>
-<p>Updates the employment config of specific employment id. <br>
-Emits a {UpdateEmploymentConfig} event.</p>
+<h3 id="extendemployment-1"><a class="header" href="#extendemployment-1">extendEmployment</a></h3>
+<p>Extends the employment config of specific employment id. <br>
+Emits a {ExtendEmployment} event.</p>
 <p><em>It will try to collect the employment first, and then update the employment config.</em></p>
-<pre><code class="language-solidity">function renewalEmploymentConfig(uint256 employmentConfigId, uint256 endTime, uint256 deadline, bytes memory signature)
+<pre><code class="language-solidity">function extendEmployment(uint256 employmentId, uint256 extendTime, uint256 deadline, bytes memory signature)
     external
     override
-    validEmploymentId(employmentConfigId);
+    validEmploymentId(employmentId);
 </code></pre>
 <p><strong>Parameters</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>employmentConfigId</code></td><td><code>uint256</code></td><td>The employment config ID to update.</td></tr>
-<tr><td><code>endTime</code></td><td><code>uint256</code></td><td>The end time of employment.</td></tr>
+<tr><td><code>employmentId</code></td><td><code>uint256</code></td><td>The employment config ID to update.</td></tr>
+<tr><td><code>extendTime</code></td><td><code>uint256</code></td><td>The extend time of employment.</td></tr>
 <tr><td><code>deadline</code></td><td><code>uint256</code></td><td>The deadline of employment.</td></tr>
 <tr><td><code>signature</code></td><td><code>bytes</code></td><td>The signature of the message.</td></tr>
 </tbody></table>
@@ -507,26 +517,21 @@ Emits a {UpdateEmploymentConfig} event.</p>
 <p>Cancels the employment. <br>
 Emits a {CancelEmployment} event.</p>
 <p><em>It will try to collect the remaining assets first, and then delete the employment config.</em></p>
-<pre><code class="language-solidity">function cancelEmployment(uint256 employmentConfigId) external override validEmploymentId(employmentConfigId);
+<pre><code class="language-solidity">function cancelEmployment(uint256 employmentId) external override validEmploymentId(employmentId);
 </code></pre>
 <p><strong>Parameters</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>employmentConfigId</code></td><td><code>uint256</code></td><td>The employment config ID to cancel.</td></tr>
+<tr><td><code>employmentId</code></td><td><code>uint256</code></td><td>The employment config ID to cancel.</td></tr>
 </tbody></table>
 </div>
-<h3 id="claimsalary-1"><a class="header" href="#claimsalary-1">claimSalary</a></h3>
-<pre><code class="language-solidity">function claimSalary(uint256 employmentConfigId) external override validEmploymentId(employmentConfigId) nonReentrant;
+<h3 id="claimfund-1"><a class="header" href="#claimfund-1">claimFund</a></h3>
+<pre><code class="language-solidity">function claimFund(uint256 employmentId) external override validEmploymentId(employmentId) nonReentrant;
 </code></pre>
 <h3 id="getfeefraction-1"><a class="header" href="#getfeefraction-1">getFeeFraction</a></h3>
 <p>Returns the fee percentage of specific &lt;receiver, employment&gt;.</p>
 <p><em>It will return the first non-zero value by priority feeFraction4Character and defaultFeeFraction.</em></p>
-<pre><code class="language-solidity">function getFeeFraction(address feeReceiver) external view override returns (uint256);
+<pre><code class="language-solidity">function getFeeFraction() external view override returns (uint256);
 </code></pre>
-<p><strong>Parameters</strong></p>
-<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>feeReceiver</code></td><td><code>address</code></td><td>The fee receiver address.</td></tr>
-</tbody></table>
-</div>
 <p><strong>Returns</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
 <tr><td><code>&lt;none&gt;</code></td><td><code>uint256</code></td><td>fraction The percentage measured in basis points. Each basis point represents 0.01%.</td></tr>
@@ -534,11 +539,10 @@ Emits a {CancelEmployment} event.</p>
 </div>
 <h3 id="getfeeamount-1"><a class="header" href="#getfeeamount-1">getFeeAmount</a></h3>
 <p>Returns how much the fee is owed by &lt;feeFraction, employmentAmount&gt;.</p>
-<pre><code class="language-solidity">function getFeeAmount(address feeReceiver, uint256 amount) external view override returns (uint256);
+<pre><code class="language-solidity">function getFeeAmount(uint256 amount) external view override returns (uint256);
 </code></pre>
 <p><strong>Parameters</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>feeReceiver</code></td><td><code>address</code></td><td>The fee receiver address.</td></tr>
 <tr><td><code>amount</code></td><td><code>uint256</code></td><td>The employment amount.</td></tr>
 </tbody></table>
 </div>
@@ -547,49 +551,63 @@ Emits a {CancelEmployment} event.</p>
 <tr><td><code>&lt;none&gt;</code></td><td><code>uint256</code></td><td>The fee amount.</td></tr>
 </tbody></table>
 </div>
-<h3 id="getemploymentconfig-1"><a class="header" href="#getemploymentconfig-1">getEmploymentConfig</a></h3>
+<h3 id="getemploymentinfo-1"><a class="header" href="#getemploymentinfo-1">getEmploymentInfo</a></h3>
 <p>Return the employment config.</p>
-<pre><code class="language-solidity">function getEmploymentConfig(uint256 employmentConfigId)
+<pre><code class="language-solidity">function getEmploymentInfo(uint256 employmentId)
     external
     view
     override
-    validEmploymentId(employmentConfigId)
-    returns (EmploymentConfig memory config);
+    validEmploymentId(employmentId)
+    returns (Employment memory employment);
 </code></pre>
 <p><strong>Parameters</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>employmentConfigId</code></td><td><code>uint256</code></td><td>The employment config ID.</td></tr>
+<tr><td><code>employmentId</code></td><td><code>uint256</code></td><td>The employment config ID.</td></tr>
 </tbody></table>
 </div>
-<h3 id="getavailablesalary-1"><a class="header" href="#getavailablesalary-1">getAvailableSalary</a></h3>
-<p>Returns the available salary of specific &lt;employment, claimTimestamp&gt;.</p>
-<p><em>It will return the available salary of specific &lt;employment, claimTimestamp&gt;.</em></p>
-<pre><code class="language-solidity">function getAvailableSalary(uint256 employmentConfigId, uint256 claimTimestamp)
+<h3 id="getcurrentemploymentindex-1"><a class="header" href="#getcurrentemploymentindex-1">getCurrentEmploymentIndex</a></h3>
+<pre><code class="language-solidity">function getCurrentEmploymentIndex() external view override returns (uint256);
+</code></pre>
+<h3 id="getavailablefund-1"><a class="header" href="#getavailablefund-1">getAvailableFund</a></h3>
+<p>Returns the available fund of specific &lt;employment, claimTimestamp&gt;.</p>
+<p><em>It will return the available fund of specific employment.</em></p>
+<pre><code class="language-solidity">function getAvailableFund(uint256 employmentId)
     external
     view
     override
-    validEmploymentId(employmentConfigId)
+    validEmploymentId(employmentId)
     returns (uint256);
 </code></pre>
 <p><strong>Parameters</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>employmentConfigId</code></td><td><code>uint256</code></td><td>The employment config ID.</td></tr>
-<tr><td><code>claimTimestamp</code></td><td><code>uint256</code></td><td>The claim time.</td></tr>
+<tr><td><code>employmentId</code></td><td><code>uint256</code></td><td>The employment ID.</td></tr>
 </tbody></table>
 </div>
 <p><strong>Returns</strong></p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>&lt;none&gt;</code></td><td><code>uint256</code></td><td>The available salary.</td></tr>
+<tr><td><code>&lt;none&gt;</code></td><td><code>uint256</code></td><td>The available fund.</td></tr>
 </tbody></table>
 </div>
-<h3 id="_getfeefraction"><a class="header" href="#_getfeefraction">_getFeeFraction</a></h3>
-<pre><code class="language-solidity">function _getFeeFraction(address feeReceiver) internal view returns (uint256);
+<h3 id="getclaimedfund-1"><a class="header" href="#getclaimedfund-1">getClaimedFund</a></h3>
+<p>Returns the claimed fund of specific employment.</p>
+<p><em>It will return the claimed fund of specific employment.</em></p>
+<pre><code class="language-solidity">function getClaimedFund(uint256 employmentId) external view returns (uint256);
 </code></pre>
+<p><strong>Parameters</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>employmentId</code></td><td><code>uint256</code></td><td>The employment config ID.</td></tr>
+</tbody></table>
+</div>
+<p><strong>Returns</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>&lt;none&gt;</code></td><td><code>uint256</code></td><td>The claimed fund.</td></tr>
+</tbody></table>
+</div>
 <h3 id="_getfeeamount"><a class="header" href="#_getfeeamount">_getFeeAmount</a></h3>
-<pre><code class="language-solidity">function _getFeeAmount(address feeReceiver, uint256 amount) internal view returns (uint256);
+<pre><code class="language-solidity">function _getFeeAmount(uint256 amount) internal view returns (uint256);
 </code></pre>
-<h3 id="_getavailablesalary"><a class="header" href="#_getavailablesalary">_getAvailableSalary</a></h3>
-<pre><code class="language-solidity">function _getAvailableSalary(uint256 amount, uint256 currentTime, uint256 startTime, uint256 endTime)
+<h3 id="_getavailablefund"><a class="header" href="#_getavailablefund">_getAvailableFund</a></h3>
+<pre><code class="language-solidity">function _getAvailableFund(uint256 amount, uint256 currentTime, uint256 startTime, uint256 endTime)
     internal
     pure
     returns (uint256);
@@ -599,71 +617,69 @@ Emits a {CancelEmployment} event.</p>
 <pre><code class="language-solidity">function _feeDenominator() internal pure virtual returns (uint96);
 </code></pre>
 <h2 id="events"><a class="header" href="#events">Events</a></h2>
-<h3 id="setemploymentconfig-2"><a class="header" href="#setemploymentconfig-2">SetEmploymentConfig</a></h3>
-<p><em>Emitted when a employer set the employment config.</em></p>
-<pre><code class="language-solidity">event SetEmploymentConfig(
-    uint256 indexed employmentConfigId,
+<h3 id="startemployment-2"><a class="header" href="#startemployment-2">StartEmployment</a></h3>
+<p><em>Emitted when a employer start the employment.</em></p>
+<pre><code class="language-solidity">event StartEmployment(
+    uint256 indexed employmentId,
     address indexed employerAddress,
     address indexed developerAddress,
     address token,
     uint256 amount,
+    uint256 time,
     uint256 startTime,
     uint256 endTime
 );
 </code></pre>
-<h3 id="renewalemploymentconfig-2"><a class="header" href="#renewalemploymentconfig-2">RenewalEmploymentConfig</a></h3>
-<p><em>Emitted when a employer renewal the employment config.</em></p>
-<pre><code class="language-solidity">event RenewalEmploymentConfig(
-    uint256 indexed employmentConfigId,
-    address indexed employerAddress,
-    address indexed developerAddress,
-    address token,
-    uint256 amount,
-    uint256 additonalAmount,
-    uint256 startTime,
-    uint256 endTime
+<h3 id="extendemployment-2"><a class="header" href="#extendemployment-2">ExtendEmployment</a></h3>
+<p><em>Emitted when a employer extend the employment.</em></p>
+<pre><code class="language-solidity">event ExtendEmployment(
+    uint256 indexed employmentId, uint256 indexed amount, uint256 indexed time, uint256 additonalAmount, uint256 endTime
 );
 </code></pre>
-<h3 id="claimsalary-2"><a class="header" href="#claimsalary-2">ClaimSalary</a></h3>
-<p><em>Emitted when a developer claim the salary.</em></p>
-<pre><code class="language-solidity">event ClaimSalary(
-    uint256 indexed employmentConfigId, address indexed token, uint256 indexed claimAmount, uint256 lastClaimedTime
+<h3 id="claimfund-2"><a class="header" href="#claimfund-2">ClaimFund</a></h3>
+<p><em>Emitted when a developer claim the fund.</em></p>
+<pre><code class="language-solidity">event ClaimFund(
+    uint256 indexed employmentId,
+    uint256 indexed claimAmount,
+    uint256 indexed claimedAmount,
+    uint256 lastClaimedTime,
+    uint256 feeAmount
 );
 </code></pre>
 <h3 id="cancelemployment-2"><a class="header" href="#cancelemployment-2">CancelEmployment</a></h3>
-<p><em>Emitted when a developer claim the salary.</em></p>
-<pre><code class="language-solidity">event CancelEmployment(uint256 indexed employmentConfigId, address indexed token, uint256 indexed refundedAmount);
+<p><em>Emitted when a employer cancel the employment.</em></p>
+<pre><code class="language-solidity">event CancelEmployment(uint256 indexed employmentId, uint256 indexed refundedAmount, uint256 indexed cancelTime);
 </code></pre>
 <h2 id="errors"><a class="header" href="#errors">Errors</a></h2>
 <h3 id="skillshub__signerinvalid"><a class="header" href="#skillshub__signerinvalid">SkillsHub__SignerInvalid</a></h3>
 <pre><code class="language-solidity">error SkillsHub__SignerInvalid(address signer);
 </code></pre>
-<h3 id="skillshub__employmentconfigidinvalid"><a class="header" href="#skillshub__employmentconfigidinvalid">SkillsHub__EmploymentConfigIdInvalid</a></h3>
-<pre><code class="language-solidity">error SkillsHub__EmploymentConfigIdInvalid(uint256 employmentConfigId);
+<h3 id="skillshub__employmentidinvalid"><a class="header" href="#skillshub__employmentidinvalid">SkillsHub__EmploymentIdInvalid</a></h3>
+<pre><code class="language-solidity">error SkillsHub__EmploymentIdInvalid(uint256 employmentId);
 </code></pre>
 <h3 id="skillshub__employmenttimeinvalid"><a class="header" href="#skillshub__employmenttimeinvalid">SkillsHub__EmploymentTimeInvalid</a></h3>
-<pre><code class="language-solidity">error SkillsHub__EmploymentTimeInvalid(uint256 startTime, uint256 endTime);
+<pre><code class="language-solidity">error SkillsHub__EmploymentTimeInvalid(uint256 time);
 </code></pre>
-<h3 id="skillshub__renewaltimeinvalid"><a class="header" href="#skillshub__renewaltimeinvalid">SkillsHub__RenewalTimeInvalid</a></h3>
-<pre><code class="language-solidity">error SkillsHub__RenewalTimeInvalid(uint256 endTime, uint256 renewalTime);
+<h3 id="skillshub__extendtimeinvalid"><a class="header" href="#skillshub__extendtimeinvalid">SkillsHub__ExtendTimeInvalid</a></h3>
+<pre><code class="language-solidity">error SkillsHub__ExtendTimeInvalid(uint256 endTime, uint256 renewalTime);
 </code></pre>
-<h3 id="skillshub__configamountinvalid"><a class="header" href="#skillshub__configamountinvalid">SkillsHub__ConfigAmountInvalid</a></h3>
-<pre><code class="language-solidity">error SkillsHub__ConfigAmountInvalid(uint256 amount);
+<h3 id="skillshub__amountinvalid"><a class="header" href="#skillshub__amountinvalid">SkillsHub__AmountInvalid</a></h3>
+<pre><code class="language-solidity">error SkillsHub__AmountInvalid(uint256 amount);
 </code></pre>
 <h3 id="skillshub__fractionoutofrange"><a class="header" href="#skillshub__fractionoutofrange">SkillsHub__FractionOutOfRange</a></h3>
 <pre><code class="language-solidity">error SkillsHub__FractionOutOfRange(uint256 fraction);
 </code></pre>
-<h3 id="skillshub__renewalemployerinconsistent"><a class="header" href="#skillshub__renewalemployerinconsistent">SkillsHub__RenewalEmployerInconsistent</a></h3>
-<pre><code class="language-solidity">error SkillsHub__RenewalEmployerInconsistent(address employer);
+<h3 id="skillshub__extendemployerinconsistent"><a class="header" href="#skillshub__extendemployerinconsistent">SkillsHub__ExtendEmployerInconsistent</a></h3>
+<pre><code class="language-solidity">error SkillsHub__ExtendEmployerInconsistent(address employer);
 </code></pre>
-<h3 id="skillshub__renewalemploymentalreadyended"><a class="header" href="#skillshub__renewalemploymentalreadyended">SkillsHub__RenewalEmploymentAlreadyEnded</a></h3>
-<pre><code class="language-solidity">error SkillsHub__RenewalEmploymentAlreadyEnded(uint256 endTime, uint256 renewalTime);
+<h3 id="skillshub__extendemploymentalreadyended"><a class="header" href="#skillshub__extendemploymentalreadyended">SkillsHub__ExtendEmploymentAlreadyEnded</a></h3>
+<pre><code class="language-solidity">error SkillsHub__ExtendEmploymentAlreadyEnded(uint256 endTime, uint256 renewalTime);
 </code></pre>
 <h3 id="skillshub__cancelemployerinconsistent"><a class="header" href="#skillshub__cancelemployerinconsistent">SkillsHub__CancelEmployerInconsistent</a></h3>
 <pre><code class="language-solidity">error SkillsHub__CancelEmployerInconsistent(address employer);
 </code></pre>
-<h3 id="skillshub__claimsallarydeveloperinconsistent"><a class="header" href="#skillshub__claimsallarydeveloperinconsistent">SkillsHub__ClaimSallaryDeveloperInconsistent</a></h3>
-<pre><code class="language-solidity">error SkillsHub__ClaimSallaryDeveloperInconsistent(address developer);
+<h3 id="skillshub__claimfunddeveloperinconsistent"><a class="header" href="#skillshub__claimfunddeveloperinconsistent">SkillsHub__ClaimFundDeveloperInconsistent</a></h3>
+<pre><code class="language-solidity">error SkillsHub__ClaimFundDeveloperInconsistent(address developer);
 </code></pre>
 <h3 id="skillshub__employmentnotstarted"><a class="header" href="#skillshub__employmentnotstarted">SkillsHub__EmploymentNotStarted</a></h3>
 <pre><code class="language-solidity">error SkillsHub__EmploymentNotStarted(uint256 startTime, uint256 claimTime);
