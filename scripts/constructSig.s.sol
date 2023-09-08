@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 contract ConstructSigScript is Script {
     function run() public {
         OpenBuildToken token = OpenBuildToken(address(0x521FD468fBba8d929bf22F3031b693A499841E55));
-        ISkillsHub skillsHub = ISkillsHub(address(0x2D6A29b1988f2E04165A006695bDFA5611B1Cc09));
+        ISkillsHub skillsHub = ISkillsHub(address(0x6D9964EBe1E9E9e7b45E8A3112a29b82bF9Cc08E));
         // OpenBuildToken token = new OpenBuildToken();
         // ISkillsHub skillsHub = new SkillsHub();
 
@@ -29,32 +29,22 @@ contract ConstructSigScript is Script {
             )
         );
 
-        uint256 time = 1693973178;
-        uint256 deadline = 1694145978;
-        uint256 amount = 100000000;
+        uint256 amount = 200000000;
+        uint256 time = 18000;
+        uint256 deadline = 1694763829;
 
         // setup sigUtils
         SigUtils sigUtils = new SigUtils(DOMAIN_SEPARATOR);
 
         uint256 invokerPrivateKey = vm.envUint("PRIVATE_KEY");
 
-        // Construct new employment config
+        // Construct new employment
         SigUtils.Employ memory employ = SigUtils.Employ({
             amount: amount,
             time: time,
             token: address(token),
             deadline: deadline
         });
-
-        // Construct renewal employment config
-        // uint256 renewalTime = 1694069578;
-        // uint256 additonalAmount = (amount * (renewalTime - endTime)) / (endTime - startTime);
-
-        // SigUtils.Employ memory employ = SigUtils.Employ({
-        //     amount: (amount + additonalAmount) / (renewalTime - startTime),
-        //     token: address(token),
-        //     deadline: deadline
-        // });
 
         bytes32 digest = sigUtils.getTypedDataHash(employ);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(invokerPrivateKey, digest);
