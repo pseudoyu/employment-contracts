@@ -17,6 +17,7 @@ interface ISkillsHub {
         uint256 time;
         uint256 startTime;
         uint256 endTime;
+        bool active;
     }
 
     /**
@@ -58,10 +59,7 @@ interface ISkillsHub {
      * @param employmentId The employment config ID to update.
      * @param extendTime The extend time of employment.
      */
-    function extendEmployment(
-        uint256 employmentId,
-        uint256 extendTime
-    ) external;
+    function extendEmployment(uint256 employmentId, uint256 extendTime) external;
 
     /**
      * @notice Cancels the employment. <br>

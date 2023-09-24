@@ -38,10 +38,12 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
     error SkillsHub__ClaimFundDeveloperInconsistent(address developer);
     error SkillsHub__EmploymentNotStarted(uint256 startTime, uint256 claimTime);
     error SkillsHub__SignatureExpire(uint256 deadline, uint256 currentTime);
+    error SkillsHub__AddressInvalid(address addr);
+    error SkillsHub__NotOwner(address owner);
 
-    // slither-disable-start naming-convention
-    // address of web3Entry contract
+    // slither-disable-start naming-conventions
     address internal _feeReceiver;
+    address internal _owner;
     uint256 internal _fraction;
 
     uint256 internal _employmentIndex;
@@ -111,7 +113,6 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
 
     modifier validateFraction(uint256 fraction) {
         if (fraction > _feeDenominator()) revert SkillsHub__FractionOutOfRange(fraction);
-
         _;
     }
 
@@ -120,8 +121,15 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
         _;
     }
 
+    constructor() {
+        _owner = msg.sender;
+    }
+
     /// @inheritdoc ISkillsHub
     function initialize(address feeReceiver_) external override initializer {
+        if (msg.sender != _owner) revert SkillsHub__NotOwner(msg.sender);
+
+        if (feeReceiver_ == address(0)) revert SkillsHub__AddressInvalid(feeReceiver_);
         _feeReceiver = feeReceiver_;
     }
 
@@ -130,6 +138,8 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
         address feeReceiver,
         uint256 fraction
     ) external override validateFraction(fraction) {
+        if (msg.sender != _owner) revert SkillsHub__NotOwner(msg.sender);
+        if (feeReceiver == address(0)) revert SkillsHub__AddressInvalid(feeReceiver);
         _feeReceiver = feeReceiver;
         _fraction = fraction;
     }
@@ -161,7 +171,8 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
             claimedAmount: 0,
             time: time,
             startTime: block.timestamp,
-            endTime: block.timestamp + time
+            endTime: block.timestamp + time,
+            active: true
         });
 
         address signer = _recoverEmploy(amount, time, token, deadline, signature);
@@ -194,7 +205,7 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
         if (block.timestamp >= employment.endTime)
             revert SkillsHub__ExtendEmploymentAlreadyEnded(employment.endTime, block.timestamp);
 
-        uint256 additonalAmount = (employment.amount / employment.time) * extendTime;
+        uint256 additonalAmount = (employment.amount * extendTime) / employment.time;
 
         employment.amount += additonalAmount;
         employment.time += extendTime;
@@ -241,8 +252,8 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
         // emit event
         emit CancelEmployment(employmentId, employment.amount - availableFund, block.timestamp);
 
-        // delete employment config
-        delete _employments[employmentId];
+        // deactive employment config
+        employment.active = false;
     }
 
     // @inheritdoc ISkillsHub

@@ -70,6 +70,8 @@ contract SkillsHubTest is CommonTest {
     error SkillsHub__ClaimFundDeveloperInconsistent(address developer);
     error SkillsHub__EmploymentNotStarted(uint256 startTime, uint256 claimTime);
     error SkillsHub__SignatureExpire(uint256 deadline, uint256 currentTime);
+    error SkillsHub__AddressInvalid(address addr);
+    error SkillsHub__NotOwner(address owner);
 
     function setUp() public {
         _setUp();
@@ -102,7 +104,7 @@ contract SkillsHubTest is CommonTest {
     function testSetFraction(uint256 fraction) public {
         vm.assume(fraction <= 10000);
 
-        vm.startPrank(alice);
+        vm.startPrank(address(this));
         skillsHub.setFeeFraction(alice, fraction);
 
         assertEq(skillsHub.getFeeFraction(), fraction);
@@ -332,7 +334,7 @@ contract SkillsHubTest is CommonTest {
         skillsHub.startEmployment(bob, address(token), amount, time, deadline, signature);
 
         // extend employment
-        uint256 additonalAmount = extendTime * (amount / time);
+        uint256 additonalAmount = (extendTime * amount) / time;
 
         // transfer token
         token.transfer(address(alice), additonalAmount);
