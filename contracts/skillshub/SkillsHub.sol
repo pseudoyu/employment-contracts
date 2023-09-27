@@ -43,7 +43,7 @@ contract SkillsHub is Verifier, ISkillsHub, Initializable, ReentrancyGuard {
 
     // slither-disable-start naming-conventions
     address internal _feeReceiver;
-    address internal _owner;
+    address private _owner;
     uint256 internal _fraction;
 
     uint256 internal _employmentIndex;
