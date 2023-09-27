@@ -9,7 +9,7 @@
 
 ### Sepolia
 
-- SkillsHub: `0x6D9964EBe1E9E9e7b45E8A3112a29b82bF9Cc08E`
+- SkillsHub: `0xDc03bB2dFCeFa9e9eCE7DC6459be8Ac688742582`
 - OpenBuildToken: `0x521FD468fBba8d929bf22F3031b693A499841E55`
 
 ## Deploy
